@@ -54,7 +54,7 @@ window.crearUsuario = async function(){
     const col = collection(db, 'users');
     const snaps = await getDocs(col);
     
-    if(snaps.size >= 2){ 
+    if(snaps.size >= 3){ 
       alert('⚠️ Ya existen 2 usuarios. No se pueden crear más.'); 
       return; 
     }
