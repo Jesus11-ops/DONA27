@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Donaciones</title>
+  <link rel="stylesheet" href="donaciones-style.css">
+</head>
+<body>
+<header class="container">
+  <div>
+    <h1>💰 Control de Donaciones</h1>
+    <p class="muted">Registro de aportes solidarios y personales</p>
+  </div>
+  <div class="header-right">
+    <button class="btn secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card">
+    <h2>📝 Registrar Nueva Donación</h2>
+    <form class="grid-donacion" onsubmit="event.preventDefault()">
+      <div class="form-group">
+        <label>📅 Fecha</label>
+        <input type="date" id="fecha" required>
+      </div>
+
+      <div class="form-group full-width">
+        <label class="tipo-donacion-label">
+          <input type="checkbox" id="esAportePersonal" onchange="toggleTipoDonacion()">
+          ¿Es un Aporte Personal? (marque si es individual, deje sin marcar si es de congregación)
+        </label>
+      </div>
+
+      <!-- Sección para Congregación -->
+      <div id="seccionCongregacion" class="full-width">
+        <div class="grid-aporte">
+          <div class="form-group">
+            <label>⛪ Nombre Congregación</label>
+            <input type="text" id="nombreCongregacion" placeholder="Ej: Congregación Central">
+          </div>
+
+          <div class="form-group">
+            <label>👨‍🏫 Nombre Pastor</label>
+            <input type="text" id="nombrePastor" placeholder="Ej: Pastor Juan Pérez">
+          </div>
+
+          <div class="form-group">
+            <label>💵 Ofrenda Solidaria</label>
+            <input type="text" id="ofrendaSolidaria" placeholder="0" inputmode="numeric">
+            <input type="hidden" id="ofrendaSolidariaValue">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección para Aporte Personal -->
+      <div id="seccionAportePersonal" style="display:none;" class="full-width aporte-personal-box">
+        <h3>👤 Aporte Personal</h3>
+        <div class="grid-aporte">
+          <div class="form-group">
+            <label>⛪ Congregación</label>
+            <input type="text" id="aportePersonalCongregacion" placeholder="Nombre de la congregación">
+          </div>
+
+          <div class="form-group">
+            <label>Nombre de la Persona</label>
+            <input type="text" id="aportePersonalNombre" placeholder="Nombre completo">
+          </div>
+
+          <div class="form-group">
+            <label>💰 Monto del Aporte</label>
+            <input type="text" id="aporteIndividual" placeholder="0" inputmode="numeric">
+            <input type="hidden" id="aporteIndividualValue">
+          </div>
+
+          <div class="form-group full-width">
+            <label>📷 Foto del Comprobante (opcional)</label>
+            <input type="file" id="foto" accept="image/*">
+            <div id="previewContainer" style="display:none;margin-top:10px">
+              <img id="preview" style="max-width:200px;border-radius:8px;border:1px solid #e6e9ef">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions full-width">
+        <button type="button" onclick="guardarDonacion()" class="btn-primary">💾 Guardar Donación</button>
+        <button type="button" class="secondary" onclick="exportarExcel()">📊 Exportar Excel</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="resumenTotales" class="card resumen-card" style="margin-top:32px">
+    <h2>💰 Resumen General</h2>
+    <div class="totales-grid">
+      <div class="total-box">
+        <div class="total-label">Total Ofrendas Solidarias</div>
+        <div class="total-value" id="totalOfrendas">$0</div>
+        <div class="total-count" id="cantidadOfrendas">0 aportes</div>
+      </div>
+      <div class="total-box">
+        <div class="total-label">Total Aportes Individuales</div>
+        <div class="total-value" id="totalAportes">$0</div>
+        <div class="total-count" id="cantidadAportes">0 aportes</div>
+      </div>
+      <div class="total-box highlight">
+        <div class="total-label">Total Recolectado</div>
+        <div class="total-value" id="totalGeneral">$0</div>
+        <div class="total-count" id="totalDonaciones">0 donaciones</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NUEVA SECCIÓN: Totales por Congregación CON FILTROS -->
+  <section id="resumenCongregaciones" class="card" style="margin-top:32px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+      <h2 style="margin: 0; width: 100%;">⛪ Totales por Congregación</h2>
+      
+      <div class="filtros-container">
+        <button class="filtro-btn active" data-filtro="todos" onclick="filtrarCongregaciones('todos')">
+          📊 Todos
+        </button>
+        <button class="filtro-btn" data-filtro="ofrendas" onclick="filtrarCongregaciones('ofrendas')">
+          ⛪ Solidarias
+        </button>
+        <button class="filtro-btn" data-filtro="aportes" onclick="filtrarCongregaciones('aportes')">
+          👤 Individuales
+        </button>
+      </div>
+    </div>
+    
+    <div id="tablaCongregaciones">
+      <!-- Se llenará dinámicamente -->
+    </div>
+  </section>
+
+  <h2 style="margin-top:32px">📋 Registro de Donaciones</h2>
+  <section id="listaDonaciones" class="card">
+    <!-- Las donaciones se cargarán aquí dinámicamente -->
+  </section>
+</main>
+
+<footer class="container muted">Iglesia Pentecostal Unida de Colombia</footer>
+
+<script type="module" src="donaciones-app.js"></script>
+<script type="module" src="donaciones-exportar.js"></script>
+</body>
+</html>

@@ -1,0 +1,779 @@
+:root{
+  --bg:#f0f4f8;
+  --card:#ffffff;
+  --primary:#2b6cb0;
+  --accent:#2b8a7a;
+  --success:#059669;
+  --danger:#dc2626;
+  --muted:#6b7280;
+  --radius:10px;
+  --shadow: 0 6px 18px rgba(12,22,35,0.06);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: linear-gradient(180deg,#eef2f7 0%,var(--bg) 100%);
+  color:#0f172a;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding:20px 16px;
+  min-height:100vh;
+}
+
+.container{
+  max-width:1200px;
+  margin:0 auto;
+}
+
+/* ========== HEADER ========== */
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:30px;
+  flex-wrap:wrap;
+  gap:16px;
+}
+
+header h1{
+  font-size:1.8rem;
+  margin:0;
+  color:#0b1220;
+}
+
+header p{
+  margin:4px 0 0 0;
+  color:var(--muted);
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* ========== CARDS ========== */
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:24px;
+  margin-bottom:20px;
+}
+
+/* ========== FORMULARIOS ========== */
+.formulario{
+  max-width:420px;
+  margin:60px auto;
+}
+
+.form-group{
+  margin-bottom:16px;
+}
+
+.form-group label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+  color:#1f2937;
+  font-size:0.95rem;
+}
+
+.full-width{
+  grid-column: 1 / -1;
+}
+
+input[type="date"], 
+input[type="number"], 
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="file"]{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid #e6e9ef;
+  border-radius:8px;
+  font-size:0.95rem;
+  transition: border-color 0.2s;
+}
+
+input[type="date"]:focus,
+input[type="number"]:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow: 0 0 0 3px rgba(43,108,176,0.1);
+}
+
+input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  margin-right:8px;
+  cursor:pointer;
+}
+
+.tipo-donacion-label{
+  display:flex;
+  align-items:center;
+  padding:12px;
+  background:#f0f9ff;
+  border:2px solid #bfdbfe;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all 0.2s;
+  font-weight:600;
+}
+
+.tipo-donacion-label:hover{
+  background:#dbeafe;
+  border-color:#93c5fd;
+}
+
+/* ========== GRID FORMULARIO DONACIÓN ========== */
+.grid-donacion{
+  display:grid;
+  gap:16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-aporte{
+  display:grid;
+  gap:16px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.aporte-personal-box{
+  background:#f9fafb;
+  border:1px solid #e6e9ef;
+  padding:16px;
+  border-radius:8px;
+  margin-top:12px;
+}
+
+.aporte-personal-box h3{
+  margin:0 0 16px 0;
+  font-size:1.1rem;
+  color:var(--primary);
+}
+
+/* ========== BOTONES ========== */
+button, .btn{
+  background:var(--primary);
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:0.95rem;
+  transition: all 0.2s;
+}
+
+button:hover, .btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(43,108,176,0.2);
+}
+
+button:active, .btn:active{
+  transform:translateY(0);
+}
+
+.btn-primary{
+  background:var(--primary);
+}
+
+button.secondary, .btn.secondary{
+  background:var(--accent);
+}
+
+.btn.edit{
+  background:#f0f5ff;
+  color:var(--primary);
+  border:1px solid rgba(43,108,176,0.2);
+  padding:8px 12px;
+  font-size:0.9rem;
+}
+
+.btn.delete{
+  background:#fee2e2;
+  color:var(--danger);
+  border:1px solid rgba(220,38,38,0.2);
+  padding:8px 12px;
+  font-size:0.9rem;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:20px;
+}
+
+/* ========== RESUMEN DE TOTALES ========== */
+.resumen-card{
+  background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color:white;
+  border:none;
+}
+
+.resumen-card h2{
+  color:white;
+  margin:0 0 20px 0;
+}
+
+.totales-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:16px;
+}
+
+.total-box{
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  transition:all 0.3s;
+}
+
+.total-box:hover{
+  transform:translateY(-4px);
+  background:rgba(255,255,255,0.25);
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
+}
+
+.total-box.highlight{
+  background:rgba(255,215,0,0.3);
+  border:2px solid rgba(255,215,0,0.5);
+}
+
+.total-label{
+  font-size:0.9rem;
+  opacity:0.9;
+  margin-bottom:8px;
+  font-weight:500;
+}
+
+.total-value{
+  font-size:2rem;
+  font-weight:800;
+  color:white;
+  text-shadow:0 2px 4px rgba(0,0,0,0.2);
+}
+
+.total-box.highlight .total-value{
+  font-size:2.2rem;
+  color:#ffd700;
+}
+
+.total-count{
+  font-size:0.85rem;
+  opacity:0.85;
+  margin-top:6px;
+  font-weight:400;
+}
+
+/* ========== TABLA DE CONGREGACIONES ========== */
+.filtros-container {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.filtro-btn {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 2px solid transparent;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filtro-btn:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.filtro-btn.active {
+  background: linear-gradient(135deg, #2b6cb0 0%, #2563eb 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.3);
+}
+
+.filtro-btn.active:hover {
+  background: linear-gradient(135deg, #1e5a94 0%, #1d4ed8 100%);
+}
+
+.tabla-congregaciones-container{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  margin-top:16px;
+}
+
+.tabla-congregaciones{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.95rem;
+  min-width:600px;
+}
+
+.tabla-congregaciones thead{
+  background:linear-gradient(135deg, #2b6cb0 0%, #2563eb 100%);
+  color:white;
+}
+
+.tabla-congregaciones th{
+  padding:12px;
+  text-align:left;
+  font-weight:600;
+  font-size:0.9rem;
+  white-space:nowrap;
+}
+
+.tabla-congregaciones tbody tr{
+  border-bottom:1px solid #e6e9ef;
+  transition:background-color 0.2s;
+}
+
+.tabla-congregaciones tbody tr:hover{
+  background-color:#f9fafb;
+}
+
+.tabla-congregaciones tbody tr:last-child{
+  border-bottom:2px solid #2b6cb0;
+}
+
+.tabla-congregaciones td{
+  padding:12px;
+  white-space:nowrap;
+}
+
+.tabla-congregaciones .cong-nombre{
+  font-weight:600;
+  color:#1f2937;
+  min-width:150px;
+}
+
+.tabla-congregaciones .cong-valor{
+  text-align:right;
+  color:#059669;
+  font-weight:500;
+}
+
+.tabla-congregaciones .cong-cantidad{
+  text-align:center;
+  color:var(--muted);
+  font-size:0.9rem;
+}
+
+.tabla-congregaciones .cong-total{
+  text-align:right;
+  font-weight:700;
+  color:#2b6cb0;
+  font-size:1.05rem;
+}
+
+/* Indicador de scroll en móviles */
+@media (max-width:768px){
+  /* Ajustes para el header de la sección de congregaciones */
+  #resumenCongregaciones > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  
+  .filtros-container {
+    width: 100%;
+    gap: 6px;
+  }
+  
+  .filtro-btn {
+    flex: 1 1 auto;
+    min-width: calc(33.33% - 4px);
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  
+  .tabla-congregaciones-container{
+    position:relative;
+    box-shadow:inset -10px 0 10px -10px rgba(0,0,0,0.1);
+  }
+  
+  .tabla-congregaciones-container::after{
+    content:'← Desliza →';
+    position:absolute;
+    bottom:8px;
+    right:8px;
+    background:rgba(43,108,176,0.9);
+    color:white;
+    padding:4px 12px;
+    border-radius:20px;
+    font-size:0.75rem;
+    font-weight:600;
+    pointer-events:none;
+    animation:fadeSlide 2s ease-in-out infinite;
+  }
+  
+  .tabla-congregaciones{
+    font-size:0.85rem;
+  }
+  
+  .tabla-congregaciones th{
+    padding:10px 8px;
+    font-size:0.8rem;
+  }
+  
+  .tabla-congregaciones td{
+    padding:10px 8px;
+  }
+}
+
+@keyframes fadeSlide {
+  0%, 100% { opacity:0.6; }
+  50% { opacity:1; }
+}
+
+/* ========== CARD DE APORTE PERSONAL ========== */
+.aporte-personal-card .donacion-header{
+  background:linear-gradient(135deg, #2b8a7a 0%, #059669 100%);
+}
+
+/* ========== LISTA DE DONACIONES ========== */
+.donaciones-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap:20px;
+}
+
+.donacion-card{
+  background:#ffffff;
+  border:1px solid #e6e9ef;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(8,15,25,0.04);
+  transition: all 0.2s;
+}
+
+.donacion-card:hover{
+  box-shadow:0 8px 24px rgba(8,15,25,0.08);
+  transform:translateY(-2px);
+}
+
+.donacion-header{
+  background:linear-gradient(135deg, #2b6cb0 0%, #2563eb 100%);
+  color:white;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+}
+
+.donacion-header h3{
+  margin:0 0 6px 0;
+  font-size:1.1rem;
+}
+
+.donacion-header .muted{
+  color:rgba(255,255,255,0.85);
+  font-size:0.85rem;
+}
+
+.donacion-total{
+  background:rgba(255,255,255,0.2);
+  padding:8px 12px;
+  border-radius:6px;
+  font-weight:700;
+  font-size:1.1rem;
+  white-space:nowrap;
+}
+
+.donacion-body{
+  padding:16px;
+}
+
+.info-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid #f3f4f6;
+}
+
+.info-row:last-child{
+  border-bottom:none;
+}
+
+.info-row .label{
+  color:var(--muted);
+  font-size:0.9rem;
+  font-weight:500;
+}
+
+.aporte-personal-info{
+  background:#f0f9ff;
+  border:1px solid #bfdbfe;
+  padding:12px;
+  border-radius:8px;
+  margin-top:12px;
+}
+
+.aporte-personal-info .info-row{
+  border-bottom-color:#e0f2fe;
+}
+
+.comprobante-foto{
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  border:1px solid #e6e9ef;
+  cursor:pointer;
+  transition: transform 0.2s;
+}
+
+.comprobante-foto:hover{
+  transform:scale(1.02);
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+.donacion-actions{
+  display:flex;
+  gap:8px;
+  padding:12px 16px;
+  background:#f9fafb;
+  border-top:1px solid #e6e9ef;
+}
+
+/* ========== UTILIDADES ========== */
+.muted{
+  color:var(--muted);
+  font-size:0.9rem;
+}
+
+/* ========== BADGE DE ID (NUEVO v3.0) ========== */
+.donacion-id-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #78350f;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 2px solid rgba(120, 53, 15, 0.2);
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.donacion-id-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(251, 191, 36, 0.4);
+}
+
+/* ========== LINKS DE ID CLICKEABLES (NUEVO v3.0) ========== */
+.id-link {
+  color: #f59e0b;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.id-link:hover {
+  background: rgba(251, 191, 36, 0.2);
+  color: #ea580c;
+  transform: translateY(-1px);
+}
+
+.id-link:active {
+  transform: translateY(0);
+}
+
+/* ========== EFECTO HIGHLIGHT AL HACER CLICK EN ID (NUEVO v3.0) ========== */
+.highlight-donacion {
+  animation: highlightPulse 2s ease-in-out;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.5) !important;
+}
+
+@keyframes highlightPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(251, 191, 36, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
+  }
+}
+
+/* ========== COLUMNA DONANTE EN TABLA (NUEVO v3.0) ========== */
+.tabla-congregaciones .cong-donante {
+  color: #4b5563;
+  font-size: 0.85rem;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabla-congregaciones .cong-ids {
+  color: #f59e0b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+h2{
+  margin:32px 0 16px 0;
+  color:#0b1220;
+  font-size:1.5rem;
+}
+
+footer{
+  margin-top:40px;
+  text-align:center;
+  color:var(--muted);
+  font-size:0.9rem;
+  padding:20px;
+}
+
+.create-box{
+  background:var(--card);
+  border:1px solid #e6e9ef;
+  padding:16px;
+  border-radius:8px;
+  margin-top:12px;
+}
+
+.create-box h4{
+  margin:0 0 12px 0;
+  color:#1f2937;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width:900px){
+  .grid-donacion{
+    grid-template-columns:1fr;
+  }
+  
+  .donaciones-grid{
+    grid-template-columns:1fr;
+  }
+  
+  header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+}
+
+@media (max-width:600px){
+  body{
+    padding:12px 8px;
+  }
+  
+  .card{
+    padding:16px;
+  }
+  
+  header h1{
+    font-size:1.5rem;
+  }
+  
+  /* Ajustes específicos para la sección de congregaciones */
+  #resumenCongregaciones h2 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  .filtros-container {
+    gap: 6px;
+  }
+  
+  .filtro-btn {
+    padding: 8px 6px;
+    font-size: 0.7rem;
+    min-width: calc(33.33% - 4px);
+  }
+  
+  .donacion-header{
+    flex-direction:column;
+  }
+  
+  .donacion-total{
+    align-self:flex-start;
+  }
+  
+  .grid-aporte{
+    grid-template-columns:1fr;
+  }
+  
+  .info-row{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+  }
+  
+  /* Hacer la tabla más compacta en móviles */
+  .tabla-congregaciones {
+    font-size: 0.75rem;
+  }
+  
+  .tabla-congregaciones th,
+  .tabla-congregaciones td {
+    padding: 8px 6px;
+  }
+  
+  .tabla-congregaciones th {
+    font-size: 0.7rem;
+  }
+  
+  /* NUEVO v3.0: Links de ID más grandes para tocar en móvil */
+  .id-link {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    margin: 2px;
+    display: inline-block;
+    background: rgba(251, 191, 36, 0.15);
+    border-radius: 6px;
+  }
+  
+  .id-link:active {
+    background: rgba(251, 191, 36, 0.3);
+  }
+}
+
+/* ========== ANIMACIONES ========== */
+@keyframes fadeIn {
+  from {
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to {
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.donacion-card{
+  animation: fadeIn 0.3s ease-out;
+}
