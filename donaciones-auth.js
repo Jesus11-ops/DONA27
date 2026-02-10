@@ -32,7 +32,7 @@ window.login = function () {
   console.log('Intentando login con', email);
   signInWithEmailAndPassword(auth, email.trim(), password)
     .then(() => {
-      window.location.href = "donaciones-dashboard.html";
+      window.location.href = "donaciones-FOSU2.html";
     })
     .catch((err) => {
       console.error('Login error', err);
