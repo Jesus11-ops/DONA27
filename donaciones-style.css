@@ -191,7 +191,6 @@ button:active, .btn:active{
   background:var(--primary);
 }
 
-/* 🆕 v3.1: Botón para egresos */
 .btn-primary.egreso-btn{
   background:linear-gradient(135deg, var(--egreso-color) 0%, #dc2626 100%);
 }
@@ -243,7 +242,6 @@ button.secondary, .btn.secondary{
   color:rgba(255,255,255,0.95);
 }
 
-/* 🆕 v3.1: Grid expandido para 3 elementos principales */
 .totales-grid-expandida{
   display:grid;
   grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
@@ -279,7 +277,6 @@ button.secondary, .btn.secondary{
   box-shadow:0 12px 32px rgba(0,0,0,0.3);
 }
 
-/* Iconos grandes */
 .icono-grande{
   font-size:3rem;
   margin-bottom:8px;
@@ -291,7 +288,6 @@ button.secondary, .btn.secondary{
   50% { transform:translateY(-5px); }
 }
 
-/* Colores específicos para cada tipo */
 .total-box-grande.ingreso{
   border-color:rgba(16,185,129,0.4);
 }
@@ -317,7 +313,6 @@ button.secondary, .btn.secondary{
   background:rgba(245,158,11,0.25);
 }
 
-/* Desglose de ingresos */
 .desglose-ingresos{
   border-top:1px solid rgba(255,255,255,0.2);
   padding-top:16px;
@@ -419,134 +414,85 @@ button.secondary, .btn.secondary{
   background: linear-gradient(135deg, #1e5a94 0%, #1d4ed8 100%);
 }
 
-.tabla-congregaciones-container{
-  width:100%;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  margin-top:16px;
+.tabla-congregaciones {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
 }
 
-.tabla-congregaciones{
-  width:100%;
-  border-collapse:collapse;
-  font-size:0.95rem;
-  min-width:600px;
+.tabla-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr 0.8fr 1fr;
+  background: linear-gradient(135deg, #2b6cb0 0%, #2563eb 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
-.tabla-congregaciones thead{
-  background:linear-gradient(135deg, #2b6cb0 0%, #2563eb 100%);
-  color:white;
+.tabla-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr 0.8fr 1fr;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s;
 }
 
-.tabla-congregaciones th{
-  padding:12px;
-  text-align:left;
-  font-weight:600;
-  font-size:0.9rem;
-  white-space:nowrap;
+.tabla-row:hover {
+  background-color: #f9fafb;
 }
 
-.tabla-congregaciones tbody tr{
-  border-bottom:1px solid #e6e9ef;
-  transition:background-color 0.2s;
+.tabla-row.even {
+  background-color: #f9fafb;
 }
 
-.tabla-congregaciones tbody tr:hover{
-  background-color:#f9fafb;
+.tabla-row.even:hover {
+  background-color: #f3f4f6;
 }
 
-.tabla-congregaciones tbody tr:last-child{
-  border-bottom:2px solid #2b6cb0;
+.tabla-col {
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  text-align: left;
 }
 
-.tabla-congregaciones td{
-  padding:12px;
-  white-space:nowrap;
+.tabla-header .tabla-col {
+  padding: 14px 12px;
+  font-weight: 700;
 }
 
-.tabla-congregaciones .cong-nombre{
-  font-weight:600;
-  color:#1f2937;
-  min-width:150px;
+.tabla-col:nth-child(2),
+.tabla-col:nth-child(3),
+.tabla-col:nth-child(4),
+.tabla-col:nth-child(5) {
+  justify-content: flex-end;
+  text-align: right;
 }
 
-.tabla-congregaciones .cong-valor{
-  text-align:right;
-  color:#059669;
-  font-weight:500;
+.tabla-col:nth-child(6) {
+  justify-content: center;
+  text-align: center;
 }
 
-.tabla-congregaciones .cong-cantidad{
-  text-align:center;
-  color:var(--muted);
-  font-size:0.9rem;
+.link {
+  color: #2b6cb0;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: inline-block;
+  background: #f0f5ff;
+  border: 1px solid #bfdbfe;
 }
 
-.tabla-congregaciones .cong-total{
-  text-align:right;
-  font-weight:700;
-  color:#2b6cb0;
-  font-size:1.05rem;
-}
-
-/* Indicador de scroll en móviles */
-@media (max-width:768px){
-  /* Ajustes para el header de la sección de congregaciones */
-  #resumenCongregaciones > div {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-  }
-  
-  .filtros-container {
-    width: 100%;
-    gap: 6px;
-  }
-  
-  .filtro-btn {
-    flex: 1 1 auto;
-    min-width: calc(33.33% - 4px);
-    padding: 8px 10px;
-    font-size: 0.75rem;
-    text-align: center;
-  }
-  
-  .tabla-congregaciones-container{
-    position:relative;
-    box-shadow:inset -10px 0 10px -10px rgba(0,0,0,0.1);
-  }
-  
-  .tabla-congregaciones-container::after{
-    content:'← Desliza →';
-    position:absolute;
-    bottom:8px;
-    right:8px;
-    background:rgba(43,108,176,0.9);
-    color:white;
-    padding:4px 12px;
-    border-radius:20px;
-    font-size:0.75rem;
-    font-weight:600;
-    pointer-events:none;
-    animation:fadeSlide 2s ease-in-out infinite;
-  }
-  
-  .tabla-congregaciones{
-    font-size:0.85rem;
-  }
-  
-  .tabla-congregaciones th{
-    padding:10px 8px;
-    font-size:0.8rem;
-  }
-  
-  .tabla-congregaciones td{
-    padding:10px 8px;
-  }
-}
-
-@keyframes fadeSlide {
-  0%, 100% { opacity:0.6; }
-  50% { opacity:1; }
+.link:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(43, 108, 176, 0.2);
 }
 
 /* ========== CARD DE APORTE PERSONAL ========== */
@@ -554,7 +500,6 @@ button.secondary, .btn.secondary{
   background:linear-gradient(135deg, #2b8a7a 0%, #059669 100%);
 }
 
-/* 🆕 v3.1: CARD DE EGRESO */
 .egreso-card .donacion-header{
   background:linear-gradient(135deg, var(--egreso-color) 0%, #dc2626 100%);
 }
@@ -577,6 +522,7 @@ button.secondary, .btn.secondary{
   overflow:hidden;
   box-shadow:0 2px 8px rgba(8,15,25,0.04);
   transition: all 0.2s;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .donacion-card:hover{
@@ -675,7 +621,6 @@ button.secondary, .btn.secondary{
   font-size:0.9rem;
 }
 
-/* ========== BADGE DE ID (NUEVO v3.0) ========== */
 .donacion-id-badge {
   display: inline-block;
   background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
@@ -694,7 +639,6 @@ button.secondary, .btn.secondary{
   box-shadow: 0 4px 8px rgba(251, 191, 36, 0.4);
 }
 
-/* ========== LINKS DE ID CLICKEABLES (NUEVO v3.0) ========== */
 .id-link {
   color: #f59e0b;
   text-decoration: none;
@@ -716,7 +660,6 @@ button.secondary, .btn.secondary{
   transform: translateY(0);
 }
 
-/* ========== EFECTO HIGHLIGHT AL HACER CLICK EN ID (NUEVO v3.0) ========== */
 .highlight-donacion {
   animation: highlightPulse 2s ease-in-out;
   box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.5) !important;
@@ -732,25 +675,6 @@ button.secondary, .btn.secondary{
   100% {
     box-shadow: 0 0 0 0 rgba(251, 191, 36, 0);
   }
-}
-
-/* ========== COLUMNA DONANTE EN TABLA (NUEVO v3.0) ========== */
-.tabla-congregaciones .cong-donante {
-  color: #4b5563;
-  font-size: 0.85rem;
-  max-width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tabla-congregaciones .cong-ids {
-  color: #f59e0b;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-align: center;
-  white-space: nowrap;
-  min-width: 80px;
 }
 
 h2{
@@ -795,10 +719,65 @@ footer{
     align-items:flex-start;
   }
   
-  /* 🆕 v3.1: Responsive para totales expandidos */
   .totales-grid-expandida{
     grid-template-columns:1fr;
   }
+}
+
+@media (max-width:768px){
+  #resumenCongregaciones > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  
+  .filtros-container {
+    width: 100%;
+    gap: 6px;
+  }
+  
+  .filtro-btn {
+    flex: 1 1 auto;
+    min-width: calc(33.33% - 4px);
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+  
+  .tabla-header {
+    display: none;
+  }
+  
+  .tabla-row {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .tabla-col {
+    justify-content: space-between !important;
+    padding: 6px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .tabla-col:last-child {
+    border-bottom: none;
+  }
+  
+  .tabla-col:nth-child(1)::before { content: 'Congregación: '; font-weight: 600; color: #6b7280; }
+  .tabla-col:nth-child(2)::before { content: 'Ofrendas: '; font-weight: 600; color: #6b7280; }
+  .tabla-col:nth-child(3)::before { content: 'Aportes: '; font-weight: 600; color: #6b7280; }
+  .tabla-col:nth-child(4)::before { content: 'Total: '; font-weight: 600; color: #6b7280; }
+  .tabla-col:nth-child(5)::before { content: 'Registros: '; font-weight: 600; color: #6b7280; }
+  .tabla-col:nth-child(6)::before { content: 'Acciones: '; font-weight: 600; color: #6b7280; }
+}
+
+@keyframes fadeSlide {
+  0%, 100% { opacity:0.6; }
+  50% { opacity:1; }
 }
 
 @media (max-width:600px){
@@ -814,7 +793,6 @@ footer{
     font-size:1.5rem;
   }
   
-  /* Ajustes específicos para la sección de congregaciones */
   #resumenCongregaciones h2 {
     font-size: 1.2rem;
     margin-bottom: 12px;
@@ -848,21 +826,6 @@ footer{
     gap:4px;
   }
   
-  /* Hacer la tabla más compacta en móviles */
-  .tabla-congregaciones {
-    font-size: 0.75rem;
-  }
-  
-  .tabla-congregaciones th,
-  .tabla-congregaciones td {
-    padding: 8px 6px;
-  }
-  
-  .tabla-congregaciones th {
-    font-size: 0.7rem;
-  }
-  
-  /* NUEVO v3.0: Links de ID más grandes para tocar en móvil */
   .id-link {
     padding: 6px 10px;
     font-size: 0.85rem;
@@ -877,7 +840,6 @@ footer{
   }
 }
 
-/* ========== ANIMACIONES ========== */
 @keyframes fadeIn {
   from {
     opacity:0;
@@ -887,8 +849,4 @@ footer{
     opacity:1;
     transform:translateY(0);
   }
-}
-
-.donacion-card{
-  animation: fadeIn 0.3s ease-out;
 }
