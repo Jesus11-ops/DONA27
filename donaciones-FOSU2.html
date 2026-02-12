@@ -9,8 +9,8 @@
 <body>
 <header class="container">
   <div>
-    <h1>💰 Control de Donaciones</h1>
-    <p class="muted">Registro de aportes solidarios y personales</p>
+    <h1>💰 Control de Donaciones y Egresos</h1>
+    <p class="muted">Registro de aportes solidarios, personales y control de gastos</p>
   </div>
   <div class="header-right">
     <button class="btn secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
@@ -91,23 +91,78 @@
     </form>
   </section>
 
+  <!-- ========== 🆕 v3.1: SECCIÓN REGISTRAR EGRESO ========== -->
+  <section class="card" style="margin-top:32px">
+    <h2>💸 Registrar Nuevo Egreso</h2>
+    <form class="grid-donacion" onsubmit="event.preventDefault()">
+      <div class="form-group">
+        <label>📅 Fecha del Egreso</label>
+        <input type="date" id="egresoFecha" required>
+      </div>
+
+      <div class="form-group">
+        <label>📋 Concepto del Egreso</label>
+        <input type="text" id="egresoConcepto" placeholder="Ej: Pago de servicios, Ayuda a hermano, etc." required>
+      </div>
+
+      <div class="form-group full-width">
+        <label>📝 Descripción (opcional)</label>
+        <input type="text" id="egresoDescripcion" placeholder="Detalles adicionales sobre el egreso">
+      </div>
+
+      <div class="form-group">
+        <label>💵 Monto del Egreso</label>
+        <input type="text" id="egresoMonto" placeholder="0" inputmode="numeric">
+        <input type="hidden" id="egresoMontoValue">
+      </div>
+
+      <div class="actions full-width">
+        <button type="button" onclick="guardarEgreso()" class="btn-primary egreso-btn">💸 Guardar Egreso</button>
+      </div>
+    </form>
+  </section>
+
   <section id="resumenTotales" class="card resumen-card" style="margin-top:32px">
-    <h2>💰 Resumen General</h2>
-    <div class="totales-grid">
-      <div class="total-box">
-        <div class="total-label">Total Ofrendas Solidarias</div>
-        <div class="total-value" id="totalOfrendas">$0</div>
-        <div class="total-count" id="cantidadOfrendas">0 aportes</div>
-      </div>
-      <div class="total-box">
-        <div class="total-label">Total Aportes Individuales</div>
-        <div class="total-value" id="totalAportes">$0</div>
-        <div class="total-count" id="cantidadAportes">0 aportes</div>
-      </div>
-      <div class="total-box highlight">
-        <div class="total-label">Total Recolectado</div>
+    <h2>💰 Resumen Financiero</h2>
+    
+    <!-- 🆕 v3.1: Tres indicadores principales -->
+    <div class="totales-grid-expandida">
+      <div class="total-box-grande ingreso">
+        <div class="icono-grande">💵</div>
+        <div class="total-label">Total Ingresos</div>
         <div class="total-value" id="totalGeneral">$0</div>
         <div class="total-count" id="totalDonaciones">0 donaciones</div>
+      </div>
+
+      <div class="total-box-grande egreso">
+        <div class="icono-grande">💸</div>
+        <div class="total-label">Total Egresos</div>
+        <div class="total-value" id="totalEgresos">$0</div>
+        <div class="total-count" id="cantidadEgresos">0 egresos</div>
+      </div>
+
+      <div class="total-box-grande saldo">
+        <div class="icono-grande">💰</div>
+        <div class="total-label">Saldo Disponible</div>
+        <div class="total-value" id="saldoDisponible">$0</div>
+        <div class="total-count">Ingresos - Egresos</div>
+      </div>
+    </div>
+
+    <!-- Desglose de Ingresos -->
+    <div class="desglose-ingresos">
+      <h3 style="margin: 24px 0 16px 0; color: rgba(255,255,255,0.95); font-size: 1.1rem;">📊 Desglose de Ingresos</h3>
+      <div class="totales-grid">
+        <div class="total-box">
+          <div class="total-label">Ofrendas Solidarias</div>
+          <div class="total-value" id="totalOfrendas">$0</div>
+          <div class="total-count" id="cantidadOfrendas">0 aportes</div>
+        </div>
+        <div class="total-box">
+          <div class="total-label">Aportes Individuales</div>
+          <div class="total-value" id="totalAportes">$0</div>
+          <div class="total-count" id="cantidadAportes">0 aportes</div>
+        </div>
       </div>
     </div>
   </section>
@@ -139,9 +194,15 @@
   <section id="listaDonaciones" class="card">
     <!-- Las donaciones se cargarán aquí dinámicamente -->
   </section>
+
+  <!-- 🆕 v3.1: SECCIÓN REGISTRO DE EGRESOS -->
+  <h2 style="margin-top:32px">💸 Registro de Egresos</h2>
+  <section id="listaEgresos" class="card">
+    <!-- Los egresos se cargarán aquí dinámicamente -->
+  </section>
 </main>
 
-<footer class="container muted">Iglesia Pentecostal Unida de Colombia</footer>
+<footer class="container muted">Iglesia Pentecostal Unida de Colombia - v3.1 con Control de Egresos</footer>
 
 <script type="module" src="donaciones-app.js"></script>
 <script type="module" src="donaciones-exportar.js"></script>

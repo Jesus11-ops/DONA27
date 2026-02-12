@@ -32,6 +32,7 @@ let esUsuarioAdmin = false;
 let congregacionesGlobal = {};
 let filtroActual = 'todos';
 let donacionesGlobal = [];  // NUEVO v3.0: Almacena donaciones con IDs numéricos para relacionar tabla y tarjetas
+let egresosGlobal = [];  // 🆕 v3.1: Almacena egresos
 
 // Función para verificar si el usuario actual es admin
 function verificarPermisos(userEmail) {
@@ -52,12 +53,18 @@ function actualizarInterfazSegunPermisos() {
     seccionRegistro.style.display = esUsuarioAdmin ? 'block' : 'none';
   }
   
+  // 🆕 v3.1: Ocultar/mostrar sección de egresos
+  const seccionEgresos = document.querySelector('.card:has(#egresoConcepto)');
+  if (seccionEgresos) {
+    seccionEgresos.style.display = esUsuarioAdmin ? 'block' : 'none';
+  }
+  
   // Actualizar el header para mostrar el rol del usuario
   const headerRight = document.querySelector('.header-right');
   if (headerRight && !document.getElementById('rolUsuario')) {
     const rolIndicator = document.createElement('span');
     rolIndicator.id = 'rolUsuario';
-    rolIndicador.style.cssText = 'margin-right: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;';
+    rolIndicator.style.cssText = 'margin-right: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;';
     
     if (esUsuarioAdmin) {
       rolIndicator.textContent = '👑 Administrador';
@@ -150,12 +157,20 @@ function aplicarFormateoNumero(inputId, hiddenId) {
 window.addEventListener('DOMContentLoaded', () => {
   aplicarFormateoNumero('ofrendaSolidaria', 'ofrendaSolidariaValue');
   aplicarFormateoNumero('aporteIndividual', 'aporteIndividualValue');
+  aplicarFormateoNumero('egresoMonto', 'egresoMontoValue'); // 🆕 v3.1: Formateo para egresos
   
   // Establecer fecha actual por defecto
   const fechaInput = document.getElementById('fecha');
   if(fechaInput){
     const hoy = new Date().toISOString().split('T')[0];
     fechaInput.value = hoy;
+  }
+  
+  // 🆕 v3.1: Fecha por defecto para egresos
+  const fechaEgreso = document.getElementById('egresoFecha');
+  if(fechaEgreso){
+    const hoy = new Date().toISOString().split('T')[0];
+    fechaEgreso.value = hoy;
   }
 });
 
@@ -579,6 +594,30 @@ function actualizarTotales(ofrendas, aportes, general, cantidad, cantOfrendas, c
   if(cantidadOfrendasEl) cantidadOfrendasEl.textContent = `${cantOfrendas} aportes`;
   if(cantidadAportesEl) cantidadAportesEl.textContent = `${cantAportes} aportes`;
   
+  // 🆕 v3.1: Actualizar totales de egresos y saldo
+  let totalEgresos = 0;
+  egresosGlobal.forEach(e => {
+    totalEgresos += e.data.monto || 0;
+  });
+  
+  const saldo = general - totalEgresos;
+  
+  const totalEgresosEl = document.getElementById('totalEgresos');
+  const cantidadEgresosEl = document.getElementById('cantidadEgresos');
+  const saldoDisponibleEl = document.getElementById('saldoDisponible');
+  
+  if(totalEgresosEl) totalEgresosEl.textContent = `$${totalEgresos.toLocaleString('es-CO')}`;
+  if(cantidadEgresosEl) cantidadEgresosEl.textContent = `${egresosGlobal.length} egresos`;
+  if(saldoDisponibleEl) {
+    saldoDisponibleEl.textContent = `$${saldo.toLocaleString('es-CO')}`;
+    // Cambiar color si es negativo
+    if(saldo < 0){
+      saldoDisponibleEl.style.color = '#dc2626';
+    } else {
+      saldoDisponibleEl.style.color = '#10b981';
+    }
+  }
+  
   // Guardar congregaciones globalmente
   congregacionesGlobal = congregaciones || {};
   
@@ -860,5 +899,201 @@ window.scrollToDonacion = function(donacionID) {
     }, 2000);
   } else {
     console.warn(`No se encontró la donación con ID: ${donacionID}`);
+  }
+}
+
+// ==================== 🆕 v3.1: GUARDAR EGRESO ====================
+window.guardarEgreso = async function(){
+  if (!verificarPermisosAccion('registrar egresos')) {
+    return;
+  }
+  
+  try{
+    const fecha = document.getElementById('egresoFecha').value;
+    const concepto = document.getElementById('egresoConcepto').value.trim();
+    const descripcion = document.getElementById('egresoDescripcion').value.trim();
+    const montoValue = document.getElementById('egresoMontoValue').value;
+    const monto = Number(montoValue);
+    
+    if(!fecha){
+      alert('⚠️ Ingrese la fecha del egreso');
+      return;
+    }
+    
+    if(!concepto){
+      alert('⚠️ Ingrese el concepto del egreso');
+      return;
+    }
+    
+    if(monto <= 0){
+      alert('⚠️ Ingrese un monto válido');
+      return;
+    }
+
+    const [anio, mes, dia] = fecha.split('-');
+    const fechaObj = new Date(anio, mes - 1, dia);
+    const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const diaSemana = dias[fechaObj.getDay()];
+
+    const dataToSave = {
+      fecha,
+      diaSemana,
+      concepto,
+      descripcion,
+      monto,
+      creadoEn: new Date().toISOString()
+    };
+
+    await addDoc(collection(db, 'Egresos'), dataToSave);
+    alert('✅ Egreso registrado correctamente');
+
+    document.getElementById('egresoFecha').value = new Date().toISOString().split('T')[0];
+    document.getElementById('egresoConcepto').value = '';
+    document.getElementById('egresoDescripcion').value = '';
+    document.getElementById('egresoMonto').value = '0';
+    document.getElementById('egresoMontoValue').value = '0';
+
+  }catch(err){
+    console.error('Error guardando egreso:', err);
+    alert('❌ Error al guardar egreso: ' + err.message);
+  }
+}
+
+// ==================== 🆕 v3.1: CARGAR EGRESOS ====================
+const qEgresos = query(collection(db, 'Egresos'), orderBy('fecha', 'desc'));
+onSnapshot(qEgresos, snap => {
+  egresosGlobal = [];
+  let totalEgresos = 0;
+
+  snap.forEach(docSnap => {
+    const data = docSnap.data();
+    egresosGlobal.push({
+      id: docSnap.id,
+      data: data
+    });
+    totalEgresos += data.monto || 0;
+  });
+
+  console.log(`📉 ${egresosGlobal.length} egresos cargados`);
+  
+  mostrarEgresos();
+  actualizarResumenGeneral();
+});
+
+function mostrarEgresos() {
+  const container = document.getElementById('listaEgresos');
+  if(!container) return;
+
+  if(egresosGlobal.length === 0){
+    container.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px">No hay egresos registrados</p>';
+    return;
+  }
+
+  let html = '<div class="donaciones-grid">';
+
+  egresosGlobal.forEach(egreso => {
+    const d = egreso.data;
+    const puedeEditar = esUsuarioAdmin;
+    
+    html += `
+      <div class="donacion-card egreso-card">
+        <div class="donacion-header egreso-header">
+          <div>
+            <h3>💸 ${d.concepto}</h3>
+            <p class="muted">${d.diaSemana}, ${d.fecha}</p>
+          </div>
+          <div class="donacion-total">$${d.monto.toLocaleString('es-CO')}</div>
+        </div>
+        <div class="donacion-body">
+          ${d.descripcion ? `
+            <div class="info-row">
+              <span class="label">📝 Descripción</span>
+              <span>${d.descripcion}</span>
+            </div>
+          ` : ''}
+        </div>
+        ${puedeEditar ? `
+        <div class="donacion-actions">
+          <button class="btn edit" onclick="editarEgreso('${egreso.id}')">✏️ Editar</button>
+          <button class="btn delete" onclick="eliminarEgreso('${egreso.id}')">🗑️ Eliminar</button>
+        </div>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ==================== 🆕 v3.1: EDITAR EGRESO ====================
+window.editarEgreso = async function(id){
+  if (!verificarPermisosAccion('editar egresos')) {
+    return;
+  }
+  
+  try{
+    const ref = doc(db, 'Egresos', id);
+    const snap = await getDoc(ref);
+    
+    if(!snap.exists()){
+      alert('❌ Egreso no encontrado');
+      return;
+    }
+
+    const data = snap.data();
+    
+    const fecha = prompt('Fecha (YYYY-MM-DD):', data.fecha);
+    if(fecha === null) return;
+    
+    const concepto = prompt('Concepto:', data.concepto);
+    if(concepto === null) return;
+    
+    const descripcion = prompt('Descripción (opcional):', data.descripcion || '');
+    if(descripcion === null) return;
+    
+    const monto = prompt('Monto:', data.monto || 0);
+    if(monto === null) return;
+
+    const [anio, mes, dia] = fecha.split('-');
+    const fechaObj = new Date(anio, mes - 1, dia);
+    const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const diaSemana = dias[fechaObj.getDay()];
+
+    const updateData = {
+      fecha,
+      diaSemana,
+      concepto: concepto.trim(),
+      descripcion: descripcion.trim(),
+      monto: Number(monto)
+    };
+
+    await updateDoc(ref, updateData);
+    alert('✅ Egreso actualizado');
+
+  }catch(err){
+    console.error(err);
+    alert('❌ Error al editar: ' + err.message);
+  }
+}
+
+// ==================== 🆕 v3.1: ELIMINAR EGRESO ====================
+window.eliminarEgreso = async function(id){
+  if (!verificarPermisosAccion('eliminar egresos')) {
+    return;
+  }
+  
+  try{
+    const conf = confirm('⚠️ ¿Está seguro de eliminar este egreso?');
+    if(!conf) return;
+
+    const docRef = doc(db, 'Egresos', id);
+    await deleteDoc(docRef);
+    
+    alert('✅ Egreso eliminado');
+
+  }catch(err){
+    console.error(err);
+    alert('❌ Error al eliminar: ' + err.message);
   }
 }
