@@ -558,6 +558,9 @@ function actualizarTotales(){
   document.getElementById('totalDonaciones').textContent = `${totalesGlobales.cantidad} donaciones`;
   document.getElementById('cantidadOfrendas').textContent = `${totalesGlobales.cantOfrendas} aportes`;
   document.getElementById('cantidadAportes').textContent = `${totalesGlobales.cantAportes} aportes`;
+  
+  // Actualizar también el resumen de egresos con el total correcto
+  actualizarTotalesEgresos(totalesGlobales.general);
 }
 
 // ==================== ACTUALIZAR TOTALES EGRESOS ====================
@@ -567,7 +570,9 @@ function actualizarTotalesEgresos(totalIngresos){
     totalEgresos += e.data.monto || 0;
   });
 
-  const saldoDisponible = totalIngresos - totalEgresos;
+  // Si totalIngresos es undefined o 0, usar totalesGlobales.general
+  const ingresosActuales = totalIngresos || totalesGlobales.general || 0;
+  const saldoDisponible = ingresosActuales - totalEgresos;
 
   document.getElementById('totalEgresos').textContent = `$${totalEgresos.toLocaleString('es-CO')}`;
   document.getElementById('cantidadEgresos').textContent = `${egresosGlobal.length} egresos`;
@@ -616,28 +621,29 @@ function mostrarCongregaciones() {
 
   let html = '<div class="tabla-congregaciones">';
   
+  // Header con todas las columnas
   html += '<div class="tabla-header">';
-  html += '<div>Congregación</div>';
-  
-  if(filtroActual === 'todos'){
-    html += '<div>Ofrendas</div>';
-    html += '<div>Aportes</div>';
-  }
-  
-  html += '<div>Total</div>';
+  html += '<div class="tabla-col">Congregación</div>';
+  html += '<div class="tabla-col">Ofrendas</div>';
+  html += '<div class="tabla-col">Aportes</div>';
+  html += '<div class="tabla-col">Total</div>';
+  html += '<div class="tabla-col">Registros</div>';
+  html += '<div class="tabla-col">Ver</div>';
   html += '</div>';
 
-  congregacionesFiltradas.forEach(({ nombre, datos, totalMostrar }) => {
-    html += '<div class="tabla-row">';
-    html += `<div class="cong-nombre">${nombre}</div>`;
-    
-    if(filtroActual === 'todos'){
-      html += `<div class="cong-monto">$${datos.ofrendasSolidarias.toLocaleString('es-CO')}</div>`;
-      html += `<div class="cong-monto">$${datos.aportesIndividuales.toLocaleString('es-CO')}</div>`;
-    }
-    
-    html += `<div class="cong-total">$${totalMostrar.toLocaleString('es-CO')}</div>`;
+  // Filas con todas las columnas
+  let isEven = false;
+  congregacionesFiltradas.forEach(({ nombre, datos }) => {
+    const rowClass = isEven ? 'tabla-row even' : 'tabla-row';
+    html += `<div class="${rowClass}">`;
+    html += `<div class="tabla-col">${nombre}</div>`;
+    html += `<div class="tabla-col">$${datos.ofrendasSolidarias.toLocaleString('es-CO')}</div>`;
+    html += `<div class="tabla-col">$${datos.aportesIndividuales.toLocaleString('es-CO')}</div>`;
+    html += `<div class="tabla-col"><strong>$${datos.total.toLocaleString('es-CO')}</strong></div>`;
+    html += `<div class="tabla-col">${datos.cantidad}</div>`;
+    html += `<div class="tabla-col"><a href="#" class="link" onclick="filtrarPorCongregacion('${nombre.replace(/'/g, "\\'")}'); return false;">📋 Ver detalles</a></div>`;
     html += '</div>';
+    isEven = !isEven;
   });
 
   html += '</div>';
@@ -656,6 +662,33 @@ window.filtrarCongregaciones = function(filtro) {
   if(btnActivo) btnActivo.classList.add('active');
   
   mostrarCongregaciones();
+}
+
+// ==================== FILTRAR POR CONGREGACIÓN ESPECÍFICA ====================
+window.filtrarPorCongregacion = function(nombreCongregacion) {
+  const listaDonaciones = document.getElementById('listaDonaciones');
+  if (!listaDonaciones) return;
+  
+  // Scroll suave a la sección de donaciones
+  listaDonaciones.scrollIntoView({ 
+    behavior: 'smooth', 
+    block: 'start' 
+  });
+  
+  // Esperar a que termine el scroll antes de resaltar
+  setTimeout(() => {
+    // Resaltar solo las donaciones de esta congregación
+    const todasLasDonaciones = document.querySelectorAll('.donacion-card');
+    todasLasDonaciones.forEach(card => {
+      const titulo = card.querySelector('.donacion-header h3');
+      if (titulo && titulo.textContent.includes(nombreCongregacion)) {
+        card.classList.add('highlight-donacion');
+        setTimeout(() => {
+          card.classList.remove('highlight-donacion');
+        }, 3000);
+      }
+    });
+  }, 500);
 }
 
 // ==================== EDITAR / ELIMINAR DONACIÓN ====================
