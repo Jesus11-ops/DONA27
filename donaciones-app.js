@@ -22,19 +22,16 @@ const storage = getStorage(app);
 console.log("🔥 Firebase Donaciones App conectado");
 
 // ==================== CONTROL DE PERMISOS ====================
-// Email del único usuario con permisos de edición
 const ADMIN_EMAIL = 'J3006091729@gmail.com';
-
-// Variable global para almacenar si el usuario actual es admin
 let esUsuarioAdmin = false;
 
-// Variables globales para filtrado de congregaciones
+// Variables globales
 let congregacionesGlobal = {};
 let filtroActual = 'todos';
-let donacionesGlobal = [];  // NUEVO v3.0: Almacena donaciones con IDs numéricos para relacionar tabla y tarjetas
-let egresosGlobal = [];  // 🆕 v3.1: Almacena egresos
+let donacionesGlobal = [];
+let egresosGlobal = [];
 
-// Variables globales para totales (necesarias para actualizar el resumen)
+// Variables globales para totales
 let totalesGlobales = {
   ofrendas: 0,
   aportes: 0,
@@ -44,32 +41,26 @@ let totalesGlobales = {
   cantAportes: 0
 };
 
-// Función para verificar si el usuario actual es admin
+// Función para verificar permisos
 function verificarPermisos(userEmail) {
   esUsuarioAdmin = userEmail?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   console.log(`👤 Usuario: ${userEmail} | Admin: ${esUsuarioAdmin}`);
-  
-  // Mostrar/ocultar elementos según permisos
   actualizarInterfazSegunPermisos();
-  
   return esUsuarioAdmin;
 }
 
-// Función para actualizar la interfaz según permisos
+// Actualizar interfaz según permisos
 function actualizarInterfazSegunPermisos() {
-  // Ocultar/mostrar sección de registro
   const seccionRegistro = document.querySelector('.card:has(#fecha)');
   if (seccionRegistro) {
     seccionRegistro.style.display = esUsuarioAdmin ? 'block' : 'none';
   }
   
-  // 🆕 v3.1: Ocultar/mostrar sección de egresos
   const seccionEgresos = document.querySelector('.card:has(#egresoConcepto)');
   if (seccionEgresos) {
     seccionEgresos.style.display = esUsuarioAdmin ? 'block' : 'none';
   }
   
-  // Actualizar el header para mostrar el rol del usuario
   const headerRight = document.querySelector('.header-right');
   if (headerRight && !document.getElementById('rolUsuario')) {
     const rolIndicator = document.createElement('span');
@@ -90,7 +81,7 @@ function actualizarInterfazSegunPermisos() {
   }
 }
 
-// Función para verificar permisos antes de ejecutar acciones
+// Verificar permisos antes de acciones
 function verificarPermisosAccion(nombreAccion) {
   if (!esUsuarioAdmin) {
     alert(`⛔ Acceso Denegado\n\nSolo el administrador puede ${nombreAccion}.\n\nTu cuenta tiene permisos de solo lectura.`);
@@ -100,24 +91,17 @@ function verificarPermisosAccion(nombreAccion) {
 }
 
 // ==================== FORMATEO DE NÚMEROS ====================
-// Función para formatear números con separadores de miles
 function formatearNumero(valor) {
-  // Eliminar todo excepto números
   const numero = valor.replace(/\D/g, '');
-  
-  // Convertir a número y formatear
   if (numero === '') return '';
-  
   return Number(numero).toLocaleString('es-CO');
 }
 
-// Función para obtener el valor numérico sin formato
 function obtenerValorNumerico(valor) {
   const numero = valor.replace(/\D/g, '');
   return numero === '' ? 0 : Number(numero);
 }
 
-// Aplicar formateo a los campos numéricos
 function aplicarFormateoNumero(inputId, hiddenId) {
   const input = document.getElementById(inputId);
   const hidden = document.getElementById(hiddenId);
@@ -129,16 +113,13 @@ function aplicarFormateoNumero(inputId, hiddenId) {
     const valorAnterior = e.target.value;
     const longitudAnterior = valorAnterior.length;
     
-    // Formatear el valor
     const valorFormateado = formatearNumero(e.target.value);
     e.target.value = valorFormateado;
     
-    // Guardar el valor numérico en el campo oculto
     if (hidden) {
       hidden.value = obtenerValorNumerico(valorFormateado);
     }
     
-    // Ajustar posición del cursor
     const longitudNueva = valorFormateado.length;
     const diferencia = longitudNueva - longitudAnterior;
     const nuevaPosicion = cursorPos + diferencia;
@@ -146,7 +127,6 @@ function aplicarFormateoNumero(inputId, hiddenId) {
     e.target.setSelectionRange(nuevaPosicion, nuevaPosicion);
   });
   
-  // Formatear también al salir del campo (blur)
   input.addEventListener('blur', function(e) {
     if (e.target.value === '') {
       e.target.value = '0';
@@ -154,7 +134,6 @@ function aplicarFormateoNumero(inputId, hiddenId) {
     }
   });
   
-  // Limpiar al enfocar si es 0
   input.addEventListener('focus', function(e) {
     if (e.target.value === '0') {
       e.target.value = '';
@@ -163,20 +142,18 @@ function aplicarFormateoNumero(inputId, hiddenId) {
   });
 }
 
-// Inicializar formateo cuando el DOM esté listo
+// Inicializar formateo
 window.addEventListener('DOMContentLoaded', () => {
   aplicarFormateoNumero('ofrendaSolidaria', 'ofrendaSolidariaValue');
   aplicarFormateoNumero('aporteIndividual', 'aporteIndividualValue');
-  aplicarFormateoNumero('egresoMonto', 'egresoMontoValue'); // 🆕 v3.1: Formateo para egresos
+  aplicarFormateoNumero('egresoMonto', 'egresoMontoValue');
   
-  // Establecer fecha actual por defecto
   const fechaInput = document.getElementById('fecha');
   if(fechaInput){
     const hoy = new Date().toISOString().split('T')[0];
     fechaInput.value = hoy;
   }
   
-  // 🆕 v3.1: Fecha por defecto para egresos
   const fechaEgreso = document.getElementById('egresoFecha');
   if(fechaEgreso){
     const hoy = new Date().toISOString().split('T')[0];
@@ -185,7 +162,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==================== AUTENTICACIÓN ====================
-// Verificar autenticación
 onAuthStateChanged(auth, user => {
   if (!user) {
     if (!location.pathname.endsWith('index.html') && !location.pathname.endsWith('/')) {
@@ -193,12 +169,10 @@ onAuthStateChanged(auth, user => {
     }
   } else {
     console.log('Usuario autenticado:', user.email);
-    // Verificar permisos del usuario
     verificarPermisos(user.email);
   }
 });
 
-// Cerrar sesión
 window.cerrarSesion = async function(){
   try{
     await signOut(auth);
@@ -210,7 +184,6 @@ window.cerrarSesion = async function(){
 }
 
 // ==================== TOGGLE TIPO DE DONACIÓN ====================
-// Toggle para cambiar entre Congregación y Aporte Personal
 window.toggleTipoDonacion = function(){
   const checkbox = document.getElementById('esAportePersonal');
   const seccionCongregacion = document.getElementById('seccionCongregacion');
@@ -218,20 +191,16 @@ window.toggleTipoDonacion = function(){
   
   if(checkbox && seccionCongregacion && seccionAportePersonal){
     if(checkbox.checked){
-      // Es aporte personal
       seccionCongregacion.style.display = 'none';
       seccionAportePersonal.style.display = 'block';
       
-      // Limpiar solo campos específicos de congregación (pastor y ofrenda solidaria)
       document.getElementById('nombrePastor').value = '';
       document.getElementById('ofrendaSolidaria').value = '0';
       document.getElementById('ofrendaSolidariaValue').value = '0';
     } else {
-      // Es congregación
       seccionCongregacion.style.display = 'block';
       seccionAportePersonal.style.display = 'none';
       
-      // Limpiar campos de aporte personal
       document.getElementById('aportePersonalCongregacion').value = '';
       document.getElementById('aportePersonalNombre').value = '';
       document.getElementById('aporteIndividual').value = '0';
@@ -242,31 +211,29 @@ window.toggleTipoDonacion = function(){
   }
 }
 
-// Toggle para mostrar/ocultar aporte personal (ya no se usa, pero lo dejamos por compatibilidad)
-window.toggleAportePersonal = function(){
-  toggleTipoDonacion();
+window.previewImagen = function(){
+  const file = document.getElementById('foto').files[0];
+  const preview = document.getElementById('preview');
+  const container = document.getElementById('previewContainer');
+  
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      preview.src = e.target.result;
+      container.style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+  }else{
+    container.style.display = 'none';
+  }
 }
 
-// ==================== PREVIEW FOTO ====================
-// Preview de la foto
-const fotoInput = document.getElementById('foto');
-if(fotoInput){
-  fotoInput.addEventListener('change', function(e){
-    const file = e.target.files[0];
-    if(file){
-      const reader = new FileReader();
-      reader.onload = function(e){
-        const preview = document.getElementById('preview');
-        const previewContainer = document.getElementById('previewContainer');
-        if(preview && previewContainer){
-          preview.src = e.target.result;
-          previewContainer.style.display = 'block';
-        }
-      }
-      reader.readAsDataURL(file);
-    }
-  });
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const fotoInput = document.getElementById('foto');
+  if(fotoInput){
+    fotoInput.addEventListener('change', window.previewImagen);
+  }
+});
 
 // ==================== GUARDAR DONACIÓN ====================
 window.guardarDonacion = async function(){
@@ -283,93 +250,102 @@ window.guardarDonacion = async function(){
       return;
     }
 
-    // Calcular día de la semana
-    const [anio, mes, dia] = fecha.split('-');
-    const fechaObj = new Date(anio, mes - 1, dia);
-    const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-    const diaSemana = dias[fechaObj.getDay()];
+    let dataToSave;
+    let fotoURL = '';
 
-    let dataToSave = {
-      fecha,
-      diaSemana,
-      tieneAportePersonal: esAportePersonal,
-      creadoEn: new Date().toISOString()
-    };
-
-    if (esAportePersonal) {
-      // Es aporte personal
+    if(esAportePersonal){
       const congregacion = document.getElementById('aportePersonalCongregacion').value.trim();
       const nombrePersona = document.getElementById('aportePersonalNombre').value.trim();
-      const aporteIndividualValue = document.getElementById('aporteIndividualValue').value;
-      const aporteIndividual = Number(aporteIndividualValue);
-
+      const aporteValue = document.getElementById('aporteIndividualValue').value;
+      const aporte = Number(aporteValue);
+      const fotoFile = document.getElementById('foto').files[0];
+      
       if(!congregacion){
         alert('⚠️ Ingrese el nombre de la congregación');
         return;
       }
-
+      
       if(!nombrePersona){
         alert('⚠️ Ingrese el nombre de la persona');
         return;
       }
-
-      if(aporteIndividual <= 0){
+      
+      if(aporte <= 0){
         alert('⚠️ Ingrese un monto válido');
         return;
       }
 
-      dataToSave.nombreCongregacion = congregacion;
-      dataToSave.aportePersonal = nombrePersona;
-      dataToSave.aporteIndividual = aporteIndividual;
-      dataToSave.ofrendaSolidaria = 0;
-      dataToSave.nombrePastor = '';
-
-      // Manejar foto si existe
-      const fotoFile = document.getElementById('foto').files[0];
       if(fotoFile){
         const timestamp = Date.now();
-        const storageRef = ref(storage, `comprobantes/${timestamp}_${fotoFile.name}`);
-        await uploadBytes(storageRef, fotoFile);
-        const fotoURL = await getDownloadURL(storageRef);
-        dataToSave.fotoURL = fotoURL;
-        dataToSave.fotoPath = `comprobantes/${timestamp}_${fotoFile.name}`;
+        const fotoPath = `aportes/${timestamp}_${fotoFile.name}`;
+        const fotoRef = ref(storage, fotoPath);
+        await uploadBytes(fotoRef, fotoFile);
+        fotoURL = await getDownloadURL(fotoRef);
       }
 
-    } else {
-      // Es congregación
+      const [anio, mes, dia] = fecha.split('-');
+      const fechaObj = new Date(anio, mes - 1, dia);
+      const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const diaSemana = dias[fechaObj.getDay()];
+
+      dataToSave = {
+        fecha,
+        diaSemana,
+        nombreCongregacion: congregacion,
+        nombrePastor: '',
+        ofrendaSolidaria: 0,
+        tieneAportePersonal: true,
+        aportePersonal: nombrePersona,
+        aporteIndividual: aporte,
+        fotoURL,
+        fotoPath: fotoURL ? `aportes/${timestamp}_${fotoFile.name}` : '',
+        creadoEn: new Date().toISOString()
+      };
+    }else{
       const nombreCongregacion = document.getElementById('nombreCongregacion').value.trim();
       const nombrePastor = document.getElementById('nombrePastor').value.trim();
-      const ofrendaSolidariaValue = document.getElementById('ofrendaSolidariaValue').value;
-      const ofrendaSolidaria = Number(ofrendaSolidariaValue);
-
+      const ofrendaValue = document.getElementById('ofrendaSolidariaValue').value;
+      const ofrenda = Number(ofrendaValue);
+      
       if(!nombreCongregacion){
         alert('⚠️ Ingrese el nombre de la congregación');
         return;
       }
-
+      
       if(!nombrePastor){
         alert('⚠️ Ingrese el nombre del pastor');
         return;
       }
-
-      if(ofrendaSolidaria <= 0){
+      
+      if(ofrenda <= 0){
         alert('⚠️ Ingrese un monto válido');
         return;
       }
 
-      dataToSave.nombreCongregacion = nombreCongregacion;
-      dataToSave.nombrePastor = nombrePastor;
-      dataToSave.ofrendaSolidaria = ofrendaSolidaria;
-      dataToSave.aportePersonal = '';
-      dataToSave.aporteIndividual = 0;
+      const [anio, mes, dia] = fecha.split('-');
+      const fechaObj = new Date(anio, mes - 1, dia);
+      const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const diaSemana = dias[fechaObj.getDay()];
+
+      dataToSave = {
+        fecha,
+        diaSemana,
+        nombreCongregacion,
+        nombrePastor,
+        ofrendaSolidaria: ofrenda,
+        tieneAportePersonal: false,
+        aportePersonal: '',
+        aporteIndividual: 0,
+        fotoURL: '',
+        fotoPath: '',
+        creadoEn: new Date().toISOString()
+      };
     }
 
     await addDoc(collection(db, 'Donaciones'), dataToSave);
-    alert('✅ Donación guardada correctamente');
+    alert('✅ Donación registrada correctamente');
 
-    // Limpiar formulario
     document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-    document.getElementById('esAportePersonal').checked = false;
     document.getElementById('nombreCongregacion').value = '';
     document.getElementById('nombrePastor').value = '';
     document.getElementById('ofrendaSolidaria').value = '0';
@@ -380,10 +356,8 @@ window.guardarDonacion = async function(){
     document.getElementById('aporteIndividualValue').value = '0';
     document.getElementById('foto').value = '';
     document.getElementById('previewContainer').style.display = 'none';
-    
-    // Resetear vista a congregación
-    document.getElementById('seccionCongregacion').style.display = 'block';
-    document.getElementById('seccionAportePersonal').style.display = 'none';
+    document.getElementById('esAportePersonal').checked = false;
+    toggleTipoDonacion();
 
   }catch(err){
     console.error('Error guardando donación:', err);
@@ -392,80 +366,117 @@ window.guardarDonacion = async function(){
 }
 
 // ==================== CARGAR DONACIONES ====================
-// Cargar donaciones en tiempo real desde Firestore
 function cargarDonaciones(){
-  const listaDonaciones = document.getElementById('listaDonaciones');
-  if(!listaDonaciones) return;
-
   const q = query(collection(db, 'Donaciones'), orderBy('fecha', 'desc'));
+  
   onSnapshot(q, snap => {
     donacionesGlobal = [];
+    congregacionesGlobal = {};
+    
     let totalOfrendas = 0;
     let totalAportes = 0;
-    let conteo = 0;
-    let cantidadOfrendas = 0;
-    let cantidadAportes = 0;
-    const congregaciones = {};
+    let totalGeneral = 0;
+    let cantOfrendas = 0;
+    let cantAportes = 0;
+    let numeroID = 1;
 
     snap.forEach(docSnap => {
       const data = docSnap.data();
-      const ofrendaSolidaria = data.ofrendaSolidaria || 0;
-      const aporteIndividual = data.aporteIndividual || 0;
-      const total = ofrendaSolidaria + aporteIndividual;
-
-      // Guardar donación con ID numérico
-      const donacionID = donacionesGlobal.length + 1;
+      
       donacionesGlobal.push({
         id: docSnap.id,
-        donacionID: donacionID,
+        numeroID: numeroID++,
         data: data
       });
 
-      totalOfrendas += ofrendaSolidaria;
-      totalAportes += aporteIndividual;
-      conteo++;
+      if(data.ofrendaSolidaria > 0){
+        totalOfrendas += data.ofrendaSolidaria;
+        cantOfrendas++;
+      }
+      
+      if(data.aporteIndividual > 0){
+        totalAportes += data.aporteIndividual;
+        cantAportes++;
+      }
+      
+      totalGeneral += (data.ofrendaSolidaria || 0) + (data.aporteIndividual || 0);
 
-      if(ofrendaSolidaria > 0) cantidadOfrendas++;
-      if(aporteIndividual > 0) cantidadAportes++;
-
-      // Agrupar por congregación
-      const nombreCong = data.nombreCongregacion || 'Sin Congregación';
-      if(!congregaciones[nombreCong]){
-        congregaciones[nombreCong] = { 
-          ofrendas: 0, 
-          aportes: 0,
-          conteo: 0
+      const nombreCong = data.nombreCongregacion || 'Sin congregación';
+      if(!congregacionesGlobal[nombreCong]){
+        congregacionesGlobal[nombreCong] = {
+          ofrendasSolidarias: 0,
+          aportesIndividuales: 0,
+          total: 0,
+          cantidad: 0
         };
       }
-      congregaciones[nombreCong].ofrendas += ofrendaSolidaria;
-      congregaciones[nombreCong].aportes += aporteIndividual;
-      congregaciones[nombreCong].conteo++;
+      
+      congregacionesGlobal[nombreCong].ofrendasSolidarias += data.ofrendaSolidaria || 0;
+      congregacionesGlobal[nombreCong].aportesIndividuales += data.aporteIndividual || 0;
+      congregacionesGlobal[nombreCong].total += (data.ofrendaSolidaria || 0) + (data.aporteIndividual || 0);
+      congregacionesGlobal[nombreCong].cantidad++;
     });
 
-    console.log(`📊 ${conteo} donaciones cargadas`);
-    
-    // Guardar totales globalmente
     totalesGlobales = {
       ofrendas: totalOfrendas,
       aportes: totalAportes,
-      general: totalOfrendas + totalAportes,
-      cantidad: conteo,
-      cantOfrendas: cantidadOfrendas,
-      cantAportes: cantidadAportes
+      general: totalGeneral,
+      cantidad: snap.size,
+      cantOfrendas,
+      cantAportes
     };
 
+    console.log(`📊 ${snap.size} donaciones cargadas, Total: $${totalGeneral.toLocaleString('es-CO')}`);
+    
     mostrarDonaciones();
-    actualizarTotales(totalOfrendas, totalAportes, totalOfrendas + totalAportes, conteo, cantidadOfrendas, cantidadAportes, congregaciones);
+    actualizarTotales();
+    mostrarCongregaciones();
+    calcularYMostrarSaldosDisponibles();
   });
 }
 
-// Función para mostrar donaciones
+// ==================== 🆕 v3.2: CALCULAR SALDOS DISPONIBLES ====================
+function calcularYMostrarSaldosDisponibles() {
+  let egresosOfrendas = 0;
+  let egresosAportes = 0;
+  
+  egresosGlobal.forEach(egreso => {
+    const fuente = egreso.data.fuenteEgreso || 'ofrendasSolidarias';
+    const monto = egreso.data.monto || 0;
+    
+    if (fuente === 'ofrendasSolidarias') {
+      egresosOfrendas += monto;
+    } else if (fuente === 'aportesIndividuales') {
+      egresosAportes += monto;
+    }
+  });
+  
+  const saldoOfrendas = totalesGlobales.ofrendas - egresosOfrendas;
+  const saldoAportes = totalesGlobales.aportes - egresosAportes;
+  
+  const elemOfrendas = document.getElementById('saldoOfrendasDisponible');
+  const elemAportes = document.getElementById('saldoAportesDisponible');
+  
+  if (elemOfrendas) {
+    elemOfrendas.textContent = `$${saldoOfrendas.toLocaleString('es-CO')}`;
+    elemOfrendas.style.color = saldoOfrendas >= 0 ? '#10b981' : '#ef4444';
+  }
+  
+  if (elemAportes) {
+    elemAportes.textContent = `$${saldoAportes.toLocaleString('es-CO')}`;
+    elemAportes.style.color = saldoAportes >= 0 ? '#10b981' : '#ef4444';
+  }
+  
+  console.log(`💼 Saldos: Ofrendas=$${saldoOfrendas.toLocaleString('es-CO')}, Aportes=$${saldoAportes.toLocaleString('es-CO')}`);
+}
+
+// ==================== MOSTRAR DONACIONES ====================
 function mostrarDonaciones() {
-  const listaDonaciones = document.getElementById('listaDonaciones');
-  if(!listaDonaciones) return;
+  const container = document.getElementById('listaDonaciones');
+  if(!container) return;
 
   if(donacionesGlobal.length === 0){
-    listaDonaciones.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px">No hay donaciones registradas</p>';
+    container.innerHTML = '<p style="text-align:center;color:#6b7280;padding:40px">No hay donaciones registradas</p>';
     return;
   }
 
@@ -473,250 +484,181 @@ function mostrarDonaciones() {
 
   donacionesGlobal.forEach(donacion => {
     const d = donacion.data;
-    const donacionID = donacion.donacionID;
-    const ofrendaSolidaria = d.ofrendaSolidaria || 0;
-    const aporteIndividual = d.aporteIndividual || 0;
-    const total = ofrendaSolidaria + aporteIndividual;
-
-    if (d.tieneAportePersonal) {
-      // Tarjeta de Aporte Personal
-      html += `
-        <div class="donacion-card" id="donacion-${donacionID}">
-          <div class="donacion-header">
-            <div>
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                <span class="donacion-id-badge">#${donacionID}</span>
-                <h3 style="margin: 0;">👤 ${d.aportePersonal}</h3>
-              </div>
-              <p class="muted">📅 ${d.diaSemana || ''} • ${d.fecha}</p>
-            </div>
-            <div class="donacion-total">$${total.toLocaleString('es-CO')}</div>
+    const total = (d.ofrendaSolidaria || 0) + (d.aporteIndividual || 0);
+    const puedeEditar = esUsuarioAdmin;
+    
+    html += `
+      <div class="donacion-card" id="donacion-${donacion.numeroID}">
+        <div class="donacion-header">
+          <div>
+            <span class="donacion-numero">#${donacion.numeroID}</span>
+            <h3>⛪ ${d.nombreCongregacion}</h3>
+            <p class="muted">${d.diaSemana}, ${d.fecha}</p>
           </div>
-          
-          <div class="donacion-body">
-            <div class="info-row">
-              <span class="label">⛪ Congregación:</span>
-              <span>${d.nombreCongregacion}</span>
-            </div>
-            
-            <div class="info-row">
-              <span class="label">💰 Aporte Individual:</span>
-              <span>$${aporteIndividual.toLocaleString('es-CO')}</span>
-            </div>
-            
-            ${d.fotoURL ? `
-            <div class="info-row">
-              <span class="label">📷 Comprobante:</span>
-              <a href="${d.fotoURL}" target="_blank" class="link">Ver foto</a>
-            </div>
-            ` : ''}
-          </div>
-          
-          <div class="donacion-actions" style="display: ${esUsuarioAdmin ? 'flex' : 'none'}">
-            <button class="btn edit" onclick="editarDonacion('${donacion.id}')">✏️ Editar</button>
-            <button class="btn delete" onclick="eliminarDonacion('${donacion.id}', '${d.fotoPath || ''}')">🗑️ Eliminar</button>
-          </div>
+          <div class="donacion-total">$${total.toLocaleString('es-CO')}</div>
         </div>
-      `;
-    } else {
-      // Tarjeta de Congregación
+        <div class="donacion-body">
+    `;
+    
+    if(d.ofrendaSolidaria > 0){
       html += `
-        <div class="donacion-card" id="donacion-${donacionID}">
-          <div class="donacion-header">
-            <div>
-              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                <span class="donacion-id-badge">#${donacionID}</span>
-                <h3 style="margin: 0;">⛪ ${d.nombreCongregacion}</h3>
-              </div>
-              <p class="muted">📅 ${d.diaSemana || ''} • ${d.fecha}</p>
-            </div>
-            <div class="donacion-total">$${total.toLocaleString('es-CO')}</div>
-          </div>
-          
-          <div class="donacion-body">
-            <div class="info-row">
-              <span class="label">👨‍🏫 Pastor:</span>
-              <span>${d.nombrePastor}</span>
-            </div>
-            
-            <div class="info-row">
-              <span class="label">💵 Ofrenda Solidaria:</span>
-              <span>$${ofrendaSolidaria.toLocaleString('es-CO')}</span>
-            </div>
-          </div>
-          
-          <div class="donacion-actions" style="display: ${esUsuarioAdmin ? 'flex' : 'none'}">
-            <button class="btn edit" onclick="editarDonacion('${donacion.id}')">✏️ Editar</button>
-            <button class="btn delete" onclick="eliminarDonacion('${donacion.id}', '${d.fotoPath || ''}')">🗑️ Eliminar</button>
-          </div>
+        <div class="info-row">
+          <span class="label">👨‍🏫 Pastor</span>
+          <span>${d.nombrePastor}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">💵 Ofrenda Solidaria</span>
+          <span>$${d.ofrendaSolidaria.toLocaleString('es-CO')}</span>
         </div>
       `;
     }
+    
+    if(d.aporteIndividual > 0){
+      html += `
+        <div class="info-row">
+          <span class="label">👤 Aporte de</span>
+          <span>${d.aportePersonal}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">💰 Monto Individual</span>
+          <span>$${d.aporteIndividual.toLocaleString('es-CO')}</span>
+        </div>
+      `;
+      
+      if(d.fotoURL){
+        html += `
+          <div class="foto-comprobante">
+            <img src="${d.fotoURL}" alt="Comprobante" onclick="window.open('${d.fotoURL}', '_blank')">
+          </div>
+        `;
+      }
+    }
+    
+    html += `
+        </div>
+        ${puedeEditar ? `
+        <div class="donacion-actions">
+          <button class="btn edit" onclick="editarDonacion('${donacion.id}')">✏️ Editar</button>
+          <button class="btn delete" onclick="eliminarDonacion('${donacion.id}', '${d.fotoPath || ''}')">🗑️ Eliminar</button>
+        </div>
+        ` : ''}
+      </div>
+    `;
   });
 
   html += '</div>';
-  listaDonaciones.innerHTML = html;
+  container.innerHTML = html;
 }
 
 // ==================== ACTUALIZAR TOTALES ====================
-// Función para actualizar los totales en el resumen
-function actualizarTotales(ofrendas, aportes, general, cantidad, cantOfrendas, cantAportes, congregaciones){
-  const totalOfrendasEl = document.getElementById('totalOfrendas');
-  const totalAportesEl = document.getElementById('totalAportes');
-  const totalGeneralEl = document.getElementById('totalGeneral');
-  const totalDonacionesEl = document.getElementById('totalDonaciones');
-  const cantidadOfrendasEl = document.getElementById('cantidadOfrendas');
-  const cantidadAportesEl = document.getElementById('cantidadAportes');
-  
-  if(totalOfrendasEl) totalOfrendasEl.textContent = `$${ofrendas.toLocaleString('es-CO')}`;
-  if(totalAportesEl) totalAportesEl.textContent = `$${aportes.toLocaleString('es-CO')}`;
-  if(totalGeneralEl) totalGeneralEl.textContent = `$${general.toLocaleString('es-CO')}`;
-  if(totalDonacionesEl) totalDonacionesEl.textContent = `${cantidad} donaciones`;
-  if(cantidadOfrendasEl) cantidadOfrendasEl.textContent = `${cantOfrendas} aportes`;
-  if(cantidadAportesEl) cantidadAportesEl.textContent = `${cantAportes} aportes`;
-  
-  // 🆕 v3.1: Actualizar totales de egresos y saldo
-  actualizarTotalesEgresos(general);
-  
-  // Guardar congregaciones globalmente
-  congregacionesGlobal = congregaciones || {};
-  
-  // Actualizar tabla de congregaciones con el filtro actual
-  actualizarTablaCongregaciones();
+function actualizarTotales(){
+  document.getElementById('totalOfrendas').textContent = `$${totalesGlobales.ofrendas.toLocaleString('es-CO')}`;
+  document.getElementById('totalAportes').textContent = `$${totalesGlobales.aportes.toLocaleString('es-CO')}`;
+  document.getElementById('totalGeneral').textContent = `$${totalesGlobales.general.toLocaleString('es-CO')}`;
+  document.getElementById('totalDonaciones').textContent = `${totalesGlobales.cantidad} donaciones`;
+  document.getElementById('cantidadOfrendas').textContent = `${totalesGlobales.cantOfrendas} aportes`;
+  document.getElementById('cantidadAportes').textContent = `${totalesGlobales.cantAportes} aportes`;
 }
 
-// 🆕 v3.1: Función para actualizar totales de egresos
-function actualizarTotalesEgresos(totalIngresos) {
+// ==================== ACTUALIZAR TOTALES EGRESOS ====================
+function actualizarTotalesEgresos(totalIngresos){
   let totalEgresos = 0;
   egresosGlobal.forEach(e => {
     totalEgresos += e.data.monto || 0;
   });
+
+  const saldoDisponible = totalIngresos - totalEgresos;
+
+  document.getElementById('totalEgresos').textContent = `$${totalEgresos.toLocaleString('es-CO')}`;
+  document.getElementById('cantidadEgresos').textContent = `${egresosGlobal.length} egresos`;
+  document.getElementById('saldoDisponible').textContent = `$${saldoDisponible.toLocaleString('es-CO')}`;
   
-  const saldo = totalIngresos - totalEgresos;
-  
-  const totalEgresosEl = document.getElementById('totalEgresos');
-  const cantidadEgresosEl = document.getElementById('cantidadEgresos');
-  const saldoDisponibleEl = document.getElementById('saldoDisponible');
-  
-  if(totalEgresosEl) totalEgresosEl.textContent = `$${totalEgresos.toLocaleString('es-CO')}`;
-  if(cantidadEgresosEl) cantidadEgresosEl.textContent = `${egresosGlobal.length} egresos`;
-  if(saldoDisponibleEl) {
-    saldoDisponibleEl.textContent = `$${saldo.toLocaleString('es-CO')}`;
-    // Cambiar color si es negativo
-    if(saldo < 0){
-      saldoDisponibleEl.style.color = '#dc2626';
-    } else {
-      saldoDisponibleEl.style.color = '#10b981';
-    }
+  const saldoElement = document.getElementById('saldoDisponible');
+  if(saldoDisponible < 0){
+    saldoElement.style.color = '#ef4444';
+  } else {
+    saldoElement.style.color = '#10b981';
   }
+  
+  calcularYMostrarSaldosDisponibles();
+}
+
+// ==================== MOSTRAR CONGREGACIONES ====================
+function mostrarCongregaciones() {
+  const container = document.getElementById('tablaCongregaciones');
+  if(!container) return;
+
+  const congregaciones = Object.entries(congregacionesGlobal);
+  
+  if(congregaciones.length === 0){
+    container.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px">No hay congregaciones registradas</p>';
+    return;
+  }
+
+  let congregacionesFiltradas = congregaciones.map(([nombre, datos]) => {
+    let mostrar = true;
+    let totalMostrar = 0;
+    
+    if(filtroActual === 'ofrendas'){
+      mostrar = datos.ofrendasSolidarias > 0;
+      totalMostrar = datos.ofrendasSolidarias;
+    } else if(filtroActual === 'aportes'){
+      mostrar = datos.aportesIndividuales > 0;
+      totalMostrar = datos.aportesIndividuales;
+    } else {
+      totalMostrar = datos.total;
+    }
+    
+    return { nombre, datos, mostrar, totalMostrar };
+  }).filter(c => c.mostrar);
+
+  congregacionesFiltradas.sort((a, b) => b.totalMostrar - a.totalMostrar);
+
+  let html = '<div class="tabla-congregaciones">';
+  
+  html += '<div class="tabla-header">';
+  html += '<div>Congregación</div>';
+  
+  if(filtroActual === 'todos'){
+    html += '<div>Ofrendas</div>';
+    html += '<div>Aportes</div>';
+  }
+  
+  html += '<div>Total</div>';
+  html += '</div>';
+
+  congregacionesFiltradas.forEach(({ nombre, datos, totalMostrar }) => {
+    html += '<div class="tabla-row">';
+    html += `<div class="cong-nombre">${nombre}</div>`;
+    
+    if(filtroActual === 'todos'){
+      html += `<div class="cong-monto">$${datos.ofrendasSolidarias.toLocaleString('es-CO')}</div>`;
+      html += `<div class="cong-monto">$${datos.aportesIndividuales.toLocaleString('es-CO')}</div>`;
+    }
+    
+    html += `<div class="cong-total">$${totalMostrar.toLocaleString('es-CO')}</div>`;
+    html += '</div>';
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 // ==================== FILTRAR CONGREGACIONES ====================
-// Función para filtrar congregaciones según el tipo seleccionado
-window.filtrarCongregaciones = function(tipo) {
-  filtroActual = tipo;
+window.filtrarCongregaciones = function(filtro) {
+  filtroActual = filtro;
   
-  // Actualizar botones activos
   document.querySelectorAll('.filtro-btn').forEach(btn => {
     btn.classList.remove('active');
-    if(btn.getAttribute('data-filtro') === tipo) {
-      btn.classList.add('active');
-    }
   });
   
-  // Actualizar tabla
-  actualizarTablaCongregaciones();
+  const btnActivo = document.querySelector(`[data-filtro="${filtro}"]`);
+  if(btnActivo) btnActivo.classList.add('active');
+  
+  mostrarCongregaciones();
 }
 
-// ==================== ACTUALIZAR TABLA CONGREGACIONES ====================
-// Función para actualizar la tabla de congregaciones según el filtro
-function actualizarTablaCongregaciones() {
-  const tablaCongregaciones = document.getElementById('tablaCongregaciones');
-  if(!tablaCongregaciones || !congregacionesGlobal) return;
-  
-  const congregacionesArray = Object.keys(congregacionesGlobal).map(nombre => ({
-    nombre,
-    ...congregacionesGlobal[nombre],
-    total: congregacionesGlobal[nombre].ofrendas + congregacionesGlobal[nombre].aportes
-  }));
-  
-  // Filtrar según el tipo seleccionado
-  let congregacionesFiltradas = congregacionesArray;
-  if(filtroActual === 'ofrendas') {
-    congregacionesFiltradas = congregacionesArray.filter(c => c.ofrendas > 0);
-  } else if(filtroActual === 'aportes') {
-    congregacionesFiltradas = congregacionesArray.filter(c => c.aportes > 0);
-  }
-  
-  // Ordenar por total descendente
-  congregacionesFiltradas.sort((a, b) => b.total - a.total);
-  
-  if(congregacionesFiltradas.length === 0){
-    tablaCongregaciones.innerHTML = '<p style="text-align:center;color:#6b7280;padding:20px">No hay datos para mostrar</p>';
-    return;
-  }
-  
-  let html = `
-    <div class="tabla-congregaciones">
-      <div class="tabla-header">
-        <div class="tabla-col">Congregación</div>
-        ${filtroActual === 'todos' || filtroActual === 'ofrendas' ? '<div class="tabla-col">Ofrendas</div>' : ''}
-        ${filtroActual === 'todos' || filtroActual === 'aportes' ? '<div class="tabla-col">Aportes</div>' : ''}
-        <div class="tabla-col">Total</div>
-        <div class="tabla-col">Registros</div>
-        <div class="tabla-col">Ver</div>
-      </div>
-  `;
-  
-  congregacionesFiltradas.forEach((cong, index) => {
-    html += `
-      <div class="tabla-row ${index % 2 === 0 ? 'even' : ''}">
-        <div class="tabla-col"><strong>${cong.nombre}</strong></div>
-        ${filtroActual === 'todos' || filtroActual === 'ofrendas' ? `<div class="tabla-col">$${cong.ofrendas.toLocaleString('es-CO')}</div>` : ''}
-        ${filtroActual === 'todos' || filtroActual === 'aportes' ? `<div class="tabla-col">$${cong.aportes.toLocaleString('es-CO')}</div>` : ''}
-        <div class="tabla-col"><strong>$${cong.total.toLocaleString('es-CO')}</strong></div>
-        <div class="tabla-col">${cong.conteo}</div>
-        <div class="tabla-col">
-          <a href="#" onclick="verDonacionesCongregacion('${cong.nombre}'); return false;" class="link">📋 Ver detalles</a>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += '</div>';
-  tablaCongregaciones.innerHTML = html;
-}
-
-// ==================== VER DONACIONES POR CONGREGACIÓN ====================
-// Función para mostrar todas las donaciones de una congregación específica
-window.verDonacionesCongregacion = function(nombreCongregacion) {
-  // Filtrar donaciones de esa congregación
-  const donacionesCong = donacionesGlobal.filter(d => 
-    d.data.nombreCongregacion === nombreCongregacion
-  );
-  
-  if(donacionesCong.length === 0) {
-    alert('No se encontraron donaciones para esta congregación');
-    return;
-  }
-  
-  // Hacer scroll a la primera donación de esa congregación
-  const primeraDonacion = donacionesCong[0];
-  scrollToDonacion(primeraDonacion.donacionID);
-  
-  // Opcional: Resaltar todas las donaciones de esa congregación
-  donacionesCong.forEach(d => {
-    const elemento = document.getElementById(`donacion-${d.donacionID}`);
-    if(elemento) {
-      elemento.classList.add('highlight-donacion');
-      setTimeout(() => {
-        elemento.classList.remove('highlight-donacion');
-      }, 3000);
-    }
-  });
-}
-
-// ==================== EDITAR DONACIÓN ====================
+// ==================== EDITAR / ELIMINAR DONACIÓN ====================
 window.editarDonacion = async function(id){
   if (!verificarPermisosAccion('editar donaciones')) {
     return;
@@ -733,9 +675,8 @@ window.editarDonacion = async function(id){
 
     const data = snap.data();
     
-    // Preguntar por cada campo
     const fecha = prompt('Fecha (YYYY-MM-DD):', data.fecha);
-    if(fecha === null) return; // Usuario canceló
+    if(fecha === null) return;
     
     const nombreCongregacion = prompt('Nombre Congregación:', data.nombreCongregacion);
     if(nombreCongregacion === null) return;
@@ -746,13 +687,12 @@ window.editarDonacion = async function(id){
     const ofrendaSolidaria = prompt('Ofrenda Solidaria:', data.ofrendaSolidaria || 0);
     if(ofrendaSolidaria === null) return;
     
-    const aportePersonal = prompt('Nombre Persona (aporte personal):', data.aportePersonal || '');
+    const aportePersonal = prompt('Nombre Persona (si aplica):', data.aportePersonal || '');
     if(aportePersonal === null) return;
     
     const aporteIndividual = prompt('Aporte Individual:', data.aporteIndividual || 0);
     if(aporteIndividual === null) return;
 
-    // Calcular día de la semana para la nueva fecha
     const [anio, mes, dia] = fecha.split('-');
     const fechaObj = new Date(anio, mes - 1, dia);
     const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -766,7 +706,7 @@ window.editarDonacion = async function(id){
       ofrendaSolidaria: Number(ofrendaSolidaria),
       aportePersonal: aportePersonal.trim(),
       aporteIndividual: Number(aporteIndividual),
-      tieneAportePersonal: aportePersonal.trim() !== '' || Number(aporteIndividual) > 0
+      tieneAportePersonal: aporteIndividual > 0
     };
 
     await updateDoc(ref, updateData);
@@ -778,7 +718,6 @@ window.editarDonacion = async function(id){
   }
 }
 
-// ==================== ELIMINAR DONACIÓN ====================
 window.eliminarDonacion = async function(id, fotoPath){
   if (!verificarPermisosAccion('eliminar donaciones')) {
     return;
@@ -788,7 +727,6 @@ window.eliminarDonacion = async function(id, fotoPath){
     const conf = confirm('⚠️ ¿Está seguro de eliminar esta donación?');
     if(!conf) return;
 
-    // Eliminar foto del storage si existe
     if(fotoPath){
       try{
         const fotoRef = ref(storage, fotoPath);
@@ -799,7 +737,6 @@ window.eliminarDonacion = async function(id, fotoPath){
       }
     }
 
-    // Eliminar documento de Firestore
     const docRef = doc(db, 'Donaciones', id);
     await deleteDoc(docRef);
     
@@ -811,26 +748,19 @@ window.eliminarDonacion = async function(id, fotoPath){
   }
 }
 
-// ==================== SCROLL A DONACIÓN ====================
-// Función para hacer scroll suave a una tarjeta específica
 window.scrollToDonacion = function(donacionID) {
-  // Prevenir comportamiento por defecto del link
   event.preventDefault();
   
-  // Buscar el elemento con ese ID
   const elemento = document.getElementById(`donacion-${donacionID}`);
   
   if (elemento) {
-    // Hacer scroll suave
     elemento.scrollIntoView({ 
       behavior: 'smooth', 
       block: 'center' 
     });
     
-    // Agregar efecto de highlight temporal
     elemento.classList.add('highlight-donacion');
     
-    // Remover el highlight después de 2 segundos
     setTimeout(() => {
       elemento.classList.remove('highlight-donacion');
     }, 2000);
@@ -839,7 +769,7 @@ window.scrollToDonacion = function(donacionID) {
   }
 }
 
-// ==================== 🆕 v3.1: GUARDAR EGRESO ====================
+// ==================== 🆕 v3.2: GUARDAR EGRESO CON FUENTE ====================
 window.guardarEgreso = async function(){
   if (!verificarPermisosAccion('registrar egresos')) {
     return;
@@ -851,6 +781,7 @@ window.guardarEgreso = async function(){
     const descripcion = document.getElementById('egresoDescripcion').value.trim();
     const montoValue = document.getElementById('egresoMontoValue').value;
     const monto = Number(montoValue);
+    const fuenteEgreso = document.getElementById('fuenteEgreso').value;
     
     if(!fecha){
       alert('⚠️ Ingrese la fecha del egreso');
@@ -866,6 +797,23 @@ window.guardarEgreso = async function(){
       alert('⚠️ Ingrese un monto válido');
       return;
     }
+    
+    // Calcular saldo disponible en la fuente seleccionada
+    let egresosEnFuente = 0;
+    egresosGlobal.forEach(egreso => {
+      if (egreso.data.fuenteEgreso === fuenteEgreso) {
+        egresosEnFuente += egreso.data.monto || 0;
+      }
+    });
+    
+    const totalFuente = fuenteEgreso === 'ofrendasSolidarias' ? totalesGlobales.ofrendas : totalesGlobales.aportes;
+    const saldoDisponible = totalFuente - egresosEnFuente;
+    
+    if (monto > saldoDisponible) {
+      const nombreFuente = fuenteEgreso === 'ofrendasSolidarias' ? 'Ofrendas Solidarias' : 'Aportes Individuales';
+      alert(`⚠️ Saldo insuficiente en ${nombreFuente}\n\nDisponible: $${saldoDisponible.toLocaleString('es-CO')}\nIntentando retirar: $${monto.toLocaleString('es-CO')}`);
+      return;
+    }
 
     const [anio, mes, dia] = fecha.split('-');
     const fechaObj = new Date(anio, mes - 1, dia);
@@ -878,6 +826,7 @@ window.guardarEgreso = async function(){
       concepto,
       descripcion,
       monto,
+      fuenteEgreso,
       creadoEn: new Date().toISOString()
     };
 
@@ -889,6 +838,7 @@ window.guardarEgreso = async function(){
     document.getElementById('egresoDescripcion').value = '';
     document.getElementById('egresoMonto').value = '0';
     document.getElementById('egresoMontoValue').value = '0';
+    document.getElementById('fuenteEgreso').value = 'ofrendasSolidarias';
 
   }catch(err){
     console.error('Error guardando egreso:', err);
@@ -896,7 +846,7 @@ window.guardarEgreso = async function(){
   }
 }
 
-// ==================== 🆕 v3.1: CARGAR EGRESOS ====================
+// ==================== CARGAR EGRESOS ====================
 const qEgresos = query(collection(db, 'Egresos'), orderBy('fecha', 'desc'));
 onSnapshot(qEgresos, snap => {
   egresosGlobal = [];
@@ -914,8 +864,6 @@ onSnapshot(qEgresos, snap => {
   console.log(`📉 ${egresosGlobal.length} egresos cargados, Total: $${totalEgresos.toLocaleString('es-CO')}`);
   
   mostrarEgresos();
-  
-  // 🔧 CORRECCIÓN: Actualizar totales de egresos usando los ingresos globales
   actualizarTotalesEgresos(totalesGlobales.general);
 });
 
@@ -933,6 +881,8 @@ function mostrarEgresos() {
   egresosGlobal.forEach(egreso => {
     const d = egreso.data;
     const puedeEditar = esUsuarioAdmin;
+    const fuenteTexto = d.fuenteEgreso === 'ofrendasSolidarias' ? 'Ofrendas Solidarias' : 'Aportes Individuales';
+    const fuenteIcono = d.fuenteEgreso === 'ofrendasSolidarias' ? '⛪' : '👤';
     
     html += `
       <div class="donacion-card egreso-card">
@@ -944,6 +894,10 @@ function mostrarEgresos() {
           <div class="donacion-total">$${d.monto.toLocaleString('es-CO')}</div>
         </div>
         <div class="donacion-body">
+          <div class="info-row">
+            <span class="label">${fuenteIcono} Fuente</span>
+            <span>${fuenteTexto}</span>
+          </div>
           ${d.descripcion ? `
             <div class="info-row">
               <span class="label">📝 Descripción</span>
@@ -965,7 +919,7 @@ function mostrarEgresos() {
   container.innerHTML = html;
 }
 
-// ==================== 🆕 v3.1: EDITAR EGRESO ====================
+// ==================== EDITAR / ELIMINAR EGRESO ====================
 window.editarEgreso = async function(id){
   if (!verificarPermisosAccion('editar egresos')) {
     return;
@@ -993,6 +947,10 @@ window.editarEgreso = async function(id){
     
     const monto = prompt('Monto:', data.monto || 0);
     if(monto === null) return;
+    
+    const fuenteEgreso = confirm('¿El egreso fue de Ofrendas Solidarias?\n\nOK = Ofrendas Solidarias\nCancelar = Aportes Individuales') 
+      ? 'ofrendasSolidarias' 
+      : 'aportesIndividuales';
 
     const [anio, mes, dia] = fecha.split('-');
     const fechaObj = new Date(anio, mes - 1, dia);
@@ -1004,7 +962,8 @@ window.editarEgreso = async function(id){
       diaSemana,
       concepto: concepto.trim(),
       descripcion: descripcion.trim(),
-      monto: Number(monto)
+      monto: Number(monto),
+      fuenteEgreso
     };
 
     await updateDoc(ref, updateData);
@@ -1016,7 +975,6 @@ window.editarEgreso = async function(id){
   }
 }
 
-// ==================== 🆕 v3.1: ELIMINAR EGRESO ====================
 window.eliminarEgreso = async function(id){
   if (!verificarPermisosAccion('eliminar egresos')) {
     return;

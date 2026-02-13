@@ -91,7 +91,7 @@
     </form>
   </section>
 
-  <!-- ========== 🆕 v3.1: SECCIÓN REGISTRAR EGRESO ========== -->
+  <!-- ========== 🆕 v3.2: SECCIÓN REGISTRAR EGRESO CON SELECTOR DE FUENTE ========== -->
   <section class="card" style="margin-top:32px">
     <h2>💸 Registrar Nuevo Egreso</h2>
     <form class="grid-donacion" onsubmit="event.preventDefault()">
@@ -110,6 +110,15 @@
         <input type="text" id="egresoDescripcion" placeholder="Detalles adicionales sobre el egreso">
       </div>
 
+      <!-- 🆕 v3.2: SELECTOR DE FUENTE -->
+      <div class="form-group">
+        <label>💼 ¿De dónde sale el dinero?</label>
+        <select id="fuenteEgreso" style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;background:white;font-size:1rem;font-family:inherit;">
+          <option value="ofrendasSolidarias">⛪ Ofrendas Solidarias</option>
+          <option value="aportesIndividuales">👤 Aportes Individuales</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label>💵 Monto del Egreso</label>
         <input type="text" id="egresoMonto" placeholder="0" inputmode="numeric">
@@ -122,10 +131,12 @@
     </form>
   </section>
 
+  <!-- ========== RESUMEN FINANCIERO (HISTÓRICO) ========== -->
   <section id="resumenTotales" class="card resumen-card" style="margin-top:32px">
     <h2>💰 Resumen Financiero</h2>
+    <p class="muted" style="margin-top:-8px;margin-bottom:20px">📜 Registro histórico acumulado (no cambia)</p>
     
-    <!-- 🆕 v3.1: Tres indicadores principales -->
+    <!-- Tres indicadores principales -->
     <div class="totales-grid-expandida">
       <div class="total-box-grande ingreso">
         <div class="icono-grande">💵</div>
@@ -149,9 +160,9 @@
       </div>
     </div>
 
-    <!-- Desglose de Ingresos -->
+    <!-- Desglose de Ingresos (histórico) -->
     <div class="desglose-ingresos">
-      <h3 style="margin: 24px 0 16px 0; color: rgba(255,255,255,0.95); font-size: 1.1rem;">📊 Desglose de Ingresos</h3>
+      <h3 style="margin: 24px 0 16px 0; color: rgba(255,255,255,0.95); font-size: 1.1rem;">📊 Desglose de Ingresos (Histórico)</h3>
       <div class="totales-grid">
         <div class="total-box">
           <div class="total-label">Ofrendas Solidarias</div>
@@ -167,7 +178,28 @@
     </div>
   </section>
 
-  <!-- NUEVA SECCIÓN: Totales por Congregación CON FILTROS -->
+  <!-- ========== 🆕 v3.2: SALDOS DISPONIBLES POR FUENTE ========== -->
+  <section class="card" style="margin-top:32px;background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <h2 style="color: white; margin-bottom: 8px;">💼 Saldo Disponible Actual por Fuente</h2>
+    <p style="color: rgba(255,255,255,0.9); margin-top: 0; margin-bottom: 24px; font-size: 0.95rem;">
+      ✅ Cuánto queda disponible después de los egresos (se actualiza con cada egreso)
+    </p>
+    
+    <div class="totales-grid">
+      <div class="total-box" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+        <div class="total-label" style="color: rgba(255,255,255,0.95);">⛪ Ofrendas Solidarias</div>
+        <div class="total-value" id="saldoOfrendasDisponible" style="color: #10b981; font-size: 2rem; font-weight: 700;">$0</div>
+        <div class="total-count" style="color: rgba(255,255,255,0.8);">Disponible ahora</div>
+      </div>
+      <div class="total-box" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px);">
+        <div class="total-label" style="color: rgba(255,255,255,0.95);">👤 Aportes Individuales</div>
+        <div class="total-value" id="saldoAportesDisponible" style="color: #10b981; font-size: 2rem; font-weight: 700;">$0</div>
+        <div class="total-count" style="color: rgba(255,255,255,0.8);">Disponible ahora</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN: Totales por Congregación CON FILTROS -->
   <section id="resumenCongregaciones" class="card" style="margin-top:32px">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
       <h2 style="margin: 0; width: 100%;">⛪ Totales por Congregación</h2>
@@ -195,14 +227,14 @@
     <!-- Las donaciones se cargarán aquí dinámicamente -->
   </section>
 
-  <!-- 🆕 v3.1: SECCIÓN REGISTRO DE EGRESOS -->
+  <!-- SECCIÓN REGISTRO DE EGRESOS -->
   <h2 style="margin-top:32px">💸 Registro de Egresos</h2>
   <section id="listaEgresos" class="card">
     <!-- Los egresos se cargarán aquí dinámicamente -->
   </section>
 </main>
 
-<footer class="container muted">Iglesia Pentecostal Unida de Colombia - v3.1 con Control de Egresos</footer>
+<footer class="container muted">Iglesia Pentecostal Unida de Colombia - v3.2 con Saldos Discriminados por Fuente</footer>
 
 <script type="module" src="donaciones-app.js"></script>
 <script type="module" src="donaciones-exportar.js"></script>
